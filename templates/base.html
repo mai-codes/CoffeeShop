@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+    <title>CoffeeShop - {% block title %}{% endblock %}</title>
+
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <link rel="stylesheet" href="/static/lib/bootstrap/bootstrap.min.css">
+    <link rel="stylesheet" href="/static/css/base.css">
+
+    <script src="/static/lib/jquery/jquery.min.js"></script>
+    <script src="/static/lib/popper/popper.min.js"></script>
+    <script src="/static/lib/bootstrap/bootstrap.min.js"></script>
+    {% block header %}{% endblock %}
+</head>
+
+<body>
+
+    <header>
+        <!--Header info-->
+    </header>
+
+    <main>
+        <div class="container content">
+            {% block content %}{% endblock %}
+        </div>
+    </main>
+
+</body>
+
+</html>
