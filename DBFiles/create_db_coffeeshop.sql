@@ -9,6 +9,7 @@ CREATE TABLE User (
 );
 
 -- All orders should be visible by an admin of some sorts.
+-- Use Transactions (sql thing) to allow pending orders.
 CREATE TABLE OrderInfo (
 	ID INTEGER PRIMARY KEY,
 	UserID INTEGER NOT NULL,
@@ -21,6 +22,7 @@ CREATE TABLE OrderInfo (
 CREATE TABLE Item (
 	ID INTEGER PRIMARY KEY,
 	Type INTEGER NOT NULL, -- Should be coffee or tea so that it is possible to browse just one type of drink.
+	Price SMALLMONEY NOT NULL,
 	Name TEXT,
 	Image TEXT,
 	Description TEXT
