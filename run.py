@@ -4,14 +4,13 @@ from datetime import datetime
 from flask import Flask, g, json, render_template, request
 from db import Database
 
-DATABASE_PATH = 'coffeeShop.db'
 app = Flask(__name__)
 
 # Copied from the lecture slides.
 def get_db():
     db = getattr(g, '_database', None)
     if db is None:
-        db = Database(DATABASE_PATH)
+        db = Database()
     return db
 
 # Copied from the lecture slides.

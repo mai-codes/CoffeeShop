@@ -1,8 +1,10 @@
 import sqlite3
 
+PATH = 'DBFiles/coffeeShop.db'
+
 class Database:
     def __init__(self):
-        self.conn = sqlite3.connect('DBFiles/coffeeShop.db', isolation_level=None)
+        self.conn = sqlite3.connect(PATH, isolation_level=None)
     
     def execute(self, sql, parameters=[]):
         c = self.conn.cursor()
