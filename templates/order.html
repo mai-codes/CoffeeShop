@@ -6,12 +6,25 @@ Order
 {% endblock %}
 
 {% block content %}
-
-<section class="jumbotron">
-    <div class="text-center">
+<div class="w3-container">
+    <div class="w3-padding-32 w3-center">
         <h1 class="jumbotron-heading">Place an order</h1>
         <p class="lead text-muted">View drinks to order here:</p>
     </div>
-</section>
+
+
+    <div id="drinkstable" class="container">
+        <script>
+
+            $(() => {
+                const drinkView = new drinkView(10);
+                drinkView.load();
+            });
+        
+        </script>
+
+    </div>
+
+</div>
 
 {% endblock %}
