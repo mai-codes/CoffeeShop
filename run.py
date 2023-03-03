@@ -89,6 +89,14 @@ def orderHistory():
 def userInfo():
     return render_template('userInfo.html')
 
+@app.route('/login')
+def login():
+    return render_template('login.html')
+
+@app.route('/createNewUser')
+def createNewUser():
+    return render_template('createNewUser.html')
+
 
 if __name__ == '__main__':
     app.run(host='localhost', port=8080, debug=True)

@@ -1,1 +1,18 @@
 /*Custom CSS*/
+
+body,h1,h2,h3,h4,h5,h6 {
+    font-family: "Karma", sans-serif
+}
+.w3-bar-block .w3-bar-item {
+    padding:20px
+}
+
+.logout-button{
+    position: absolute;
+    right: 0;
+    text-align: right;
+}
+
+.dragon-drinks-title{
+    font-weight: bold;
+}
