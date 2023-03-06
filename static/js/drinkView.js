@@ -1,51 +1,48 @@
-function DrinkView(numDrinks) {
+function DrinkView(numRows, drinksPerRow) {
+    const DRINKS_PER_PAGE = numRows * drinksPerRow;
 
-    this.updateDrinks = (drinks) => {
+
+    this.updateDrinks = (items) => {
         $('#drinktable').empty();
+
         const table = $('<div class="drinktable">');
         const columnLabels = $(`
-            <div class="table-responsive">
-                <table class="table">
-                    <thead>
+            <div>
+                <table class="w3-table">
                     <tr>
-                        <th style="width: 40%">Name</th>
+                        <th>ID</th>
+                        <th>Name</th>
                     </tr>
-                    </thead>
-                    <tbody></tbody>
         `);
         $('#drinktable').append(columnLabels);
 
-        
-
-        for(let i = 0; i < numDrinks; i++){
-            const drink = drinks[i];
+        for(let i = 0; i < 3; i++){
+            const drink = items[i];
 
             const drinkRow = $(`
-                    <td class="tableItem" style="width: 40%">${Item.name}</td>
+                <tr>
+                <td>${drink.id}</td>
+                <td>${drink.name}</td>
+                </tr
             `);
-
-            $(drinkRow).find('.dec-button').on('click', _ => {
-                this.decrement(drink);
-            });
-            $(drinkRow).find('.inc-button').on('click', _ => {
-                this.increment(drink);
-            });
 
             $(table).append(drinkRow);
 
         }
         $('#drinktable').append(table);
 
-        const closing = $(`</tbody></table></div></div>`);
+        const closing = $(`</table></div></div>`);
         $('#drinktable').append(closing);
     }
 
     this.update = (data) => {
-        this.updateDrinks(data.drinks);
+        this.updateDrinks(data.items);
     }
 
     this.load = () => {
-        $.get('/api/getItems', {
+        $.get('/api/get_items', {
+            n: DRINKS_PER_PAGE,
+            offset: 20 //TODO
         }, (data) => {
             this.update(data);
         });

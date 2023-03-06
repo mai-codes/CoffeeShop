@@ -1,29 +1,32 @@
 {% extends 'base.html' %}
 {% set active = "order" %}
 
+{% block header %}
+<script src="/static/js/drinkView.js"></script>
+{% endblock %}
+
 {% block title %}
-Order
+Order a Drink
 {% endblock %}
 
 {% block content %}
 <div class="w3-container">
     <div class="w3-padding-32 w3-center">
-        <h1 class="jumbotron-heading">Place an order</h1>
+        <h1>Place an order</h1>
         <p class="lead text-muted">View drinks to order here:</p>
     </div>
 
+    <div class="w3-padding-32 w3-center">
+    <script>
 
-    <div id="drinkstable" class="container">
-        <script>
-
-            $(() => {
-                const drinkView = new drinkView(10);
-                drinkView.load();
-            });
-        
-        </script>
-
+        $(() => {
+            const drinkView = new DrinkView(2, 10);
+            drinkView.load();
+        });
+    
+    </script>
     </div>
+
 
 </div>
 
