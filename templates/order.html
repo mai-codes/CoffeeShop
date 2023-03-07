@@ -1,6 +1,10 @@
 {% extends 'base.html' %}
 {% set active = "order" %}
 
+{% block header %}
+<script src="/static/js/drinkView.js"></script>
+{% endblock %}
+
 {% block title %}
 Order
 {% endblock %}
@@ -13,11 +17,11 @@ Order
     </div>
 
 
-    <div id="drinkstable" class="container">
+    <div id="drinktable" class="container">
         <script>
 
             $(() => {
-                const drinkView = new drinkView(10);
+                const drinkView = new DrinkView(10);
                 drinkView.load();
             });
         
