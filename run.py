@@ -1,10 +1,8 @@
 import os
 
 from datetime import datetime
-from flask import Flask, g, json, render_template, request, jsonify
+from flask import Flask, g, json, render_template, request
 from db import Database
-
-DATABASE_PATH = 'coffeeShop.db'
 
 app = Flask(__name__)
 
@@ -12,7 +10,7 @@ app = Flask(__name__)
 def get_db():
     db = getattr(g, '_database', None)
     if db is None:
-        db = Database(DATABASE_PATH)
+        db = Database()
     return db
 
 # Copied from the lecture slides.
@@ -22,42 +20,12 @@ def close_connection(exception):
     if db is not None:
         db.close()
 
-
-@app.route('/')
-def home():
-    return render_template('home.html')
-
-@app.route('/order')
-def order():
-    return render_template('order.html')
-
-@app.route('/orderHistory')
-def orderHistory():
-    return render_template('orderHistory.html')
-
-@app.route('/userInfo')
-def userInfo():
-    return render_template('userInfo.html')
-
-@app.route('/login')
-def login():
-    return render_template('login.html')
-
-@app.route('/createNewUser')
-def createNewUser():
-    return render_template('createNewUser.html')
-
-def generate_response(args):
-    n = args.get('n', default=10) #Assuming that we don't have enough drinks to need more than one page
-    offset = args.get('offset', default=0)
-    return jsonify({
-        'items': get_db().get_items(n, offset),
-        'total': get_db().get_num_items()
-    })
-
-@app.route('/api/get_items', methods=['GET'])
-def api_get_items():
-    return generate_response(request.args)
+@app.route('/api/getItems', methods=['GET'])
+def apiGetItems():
+    n = int(request.args.get('n', default=20)) #Assuming that we don't have enough drinks to need more than one page
+    offset = int(request.args.get('offset', default=0))
+    items = get_db().apiGetItems(n, offset)
+    return json.jsonify(items)
 
 @app.route('/api/deleteItem', methods=['DELETE'])
 def apiDeleteItem():
@@ -104,6 +72,30 @@ def apiAddOrder():
     result = get_db().apiAddOrder(accessID, id)
     return result
 
+
+@app.route('/')
+def home():
+    return render_template('home.html')
+
+@app.route('/order')
+def order():
+    return render_template('order.html')
+
+@app.route('/orderHistory')
+def orderHistory():
+    return render_template('orderHistory.html')
+
+@app.route('/userInfo')
+def userInfo():
+    return render_template('userInfo.html')
+
+@app.route('/login')
+def login():
+    return render_template('login.html')
+
+@app.route('/createNewUser')
+def createNewUser():
+    return render_template('createNewUser.html')
 
 
 if __name__ == '__main__':

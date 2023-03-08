@@ -6,27 +6,28 @@
 {% endblock %}
 
 {% block title %}
-Order a Drink
+Order
 {% endblock %}
 
 {% block content %}
 <div class="w3-container">
     <div class="w3-padding-32 w3-center">
-        <h1>Place an order</h1>
+        <h1 class="jumbotron-heading">Place an order</h1>
         <p class="lead text-muted">View drinks to order here:</p>
     </div>
 
-    <div class="w3-padding-32 w3-center">
-    <script>
 
-        $(() => {
-            const drinkView = new DrinkView(2, 10);
-            drinkView.load();
-        });
-    
-    </script>
+    <div id="drinktable" class="container">
+        <script>
+
+            $(() => {
+                const drinkView = new DrinkView(10);
+                drinkView.load();
+            });
+        
+        </script>
+
     </div>
-
 
 </div>
 

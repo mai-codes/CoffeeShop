@@ -1,19 +1,15 @@
 import sqlite3
 
+PATH = 'DBFiles/coffeeShop.db'
 
 class Database:
-    def __init__(self, path):
-        self.conn = sqlite3.connect(path)
+    def __init__(self):
+        self.conn = sqlite3.connect(PATH, isolation_level=None)
     
-    def select(self, sql, parameters=[]):
-        c = self.conn.cursor()
-        c.execute(sql, parameters)
-        return c.fetchall()
-
     def execute(self, sql, parameters=[]):
         c = self.conn.cursor()
         c.execute(sql, parameters)
-        self.conn.commit()
+        return c.fetchall()
     
     def getPermissions(self, accessID):
         if(accessID >= 0):
@@ -32,12 +28,12 @@ class Database:
         return -1 #invalid access level
         
     
-    def get_items(self, n, offset):
+    def apiGetItems(self, n, offset):
         # obtained from the slides.
         # note that only name, image, and available are neccessary now but the other may be used in later assignments.
         # order by length of the number then by text. This way, b10 will not appear second when b2 should appear instead.
 
-        data = self.select( 'SELECT * FROM Item ORDER BY Item.id ASC ') #LIMIT ? OFFSET ?', [n, offset]
+        data = self.execute( 'SELECT * FROM Item ORDER BY Name ASC LIMIT ? OFFSET ?', [n, offset])
         return [{
             'id': d[0],
             'type': d[1],
@@ -46,11 +42,7 @@ class Database:
             'image': d[4],
             'description': d[5]
         } for d in data]
-    
-    def get_num_items(self):
-        data = self.select('SELECT COUNT(*) FROM Item')
-        return data[0][0]
-    
+
     def apiAddItem(self, accessID, itemType, itemName, itemPrice, itemImage, itemDescription):
         if(self.getPermissions(accessID) >= 1 and accessID != -1):
             data = self.execute( 'INSERT INTO ITEM (Type, Name, Price, Image, Description) VALUES (?, ?, ?, ?, ?)', [itemType, itemName, itemPrice, itemImage, itemDescription])
