@@ -10,18 +10,14 @@ function DrinkView(numDrinks) {
 
     this.updateDrinks = (drinks) => {
         $('#drinktable').empty();
-        const table = $('<div class="drinktable">');
+        const table = $('<div class="drinkTable w3-responsive">');
         const columnLabels = $(`
-            <div class="table-responsive">
-                <table class="table">
-                    <thead>
-                        <tr>
-                            <th style="width: 40%">Name</th>
-                        </tr>
-                    </thead>
-                    <tbody></tbody>
-                </table>
-            </div>
+                <table class="w3-table">
+                    <tr>
+                        <th>Name</th>
+                        <th>Image</th>
+                        <th>Price</th>
+                    </tr>
         `);
         $('#drinktable').append(columnLabels);
 
@@ -30,7 +26,9 @@ function DrinkView(numDrinks) {
 
             const drinkRow = $(`
                 <tr>
-                    <td class="tableItem" style="width: 40%">${drink.name}</td>
+                    <td>${drink.name}</td>
+                    <td><img class="w3-image drinkImage" src="/static/img/${drink.image}"></td>
+                    <td>${drink.price}</td>
                 </tr>
             `);
 
@@ -45,7 +43,7 @@ function DrinkView(numDrinks) {
         }
 
         $('#drinktable').append(table);
-        const closing = $(`</tbody></table></div></div>`);
+        const closing = $(`</table></div>`);
         $('#drinktable').append(closing);
     }
 
