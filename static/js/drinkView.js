@@ -10,26 +10,43 @@ function DrinkView(numDrinks) {
 
     this.updateDrinks = (drinks) => {
         $('#drinktable').empty();
-        const table = $('<div class="drinkTable w3-responsive">');
-        const columnLabels = $(`
-                <table class="w3-table">
-                    <tr>
-                        <th>Name</th>
-                        <th>Image</th>
-                        <th>Price</th>
-                    </tr>
-        `);
-        $('#drinktable').append(columnLabels);
+        const table = $('<div class="w3-container drinkCards"></div>');
+        // const columnLabels = $(`
+        // <div class="card">
+        //     <div class="box>
+        //         <table class="w3-table">
+        //             <tr>
+        //                 <th>Name</th>
+        //                 <th>Image</th>
+        //                 <th>Price</th>
+        //             </tr>
+        //     </div>
+        // </div>
+        // `);
+        // $('#drinktable').append(columnLabels);
 
         for (let i = 0; i < numDrinks && i < drinks.length; i++) {
             const drink = drinks[i];
 
             const drinkRow = $(`
-                <tr>
-                    <td>${drink.name}</td>
-                    <td><img class="w3-image drinkImage" src="/static/img/${drink.image}"></td>
-                    <td>${drink.price}</td>
-                </tr>
+            <div class="card-column">
+                <div class="w3-card-2">
+                    <header class="w3-container w3-sand">
+                        <h3>${drink.name}</h3>
+                    </header>
+                    <div class="w3-container">
+                        <img class="w3-image drinkImage" src="/static/img/${drink.image}">
+                        <button class="w3-btn">S</button>
+                        <button class="w3-btn">M</button>
+                        <button class="w3-btn">L</button>
+                    </div>
+                
+                    <footer class="w3-container w3-sand">
+                        <h5>${drink.price}</h5>
+                        <button class="w3-btn">Add to Cart </button>
+                    </footer>
+                </div>
+            </div>
             `);
 
             $(drinkRow).find('.dec-button').on('click', _ => {
