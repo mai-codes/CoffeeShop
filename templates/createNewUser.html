@@ -31,6 +31,14 @@
                 Please specify a new username and password below.
             </p>
 
+            {% if message %}
+            <div class="w3-panel w3-red w3-display-container">
+                <span onclick="this.parentElement.style.display='none'"
+                class="w3-button w3-large w3-display-topright">&times;</span>
+                <p>{{ message }}</p>
+            </div>
+            {% endif %}
+
             <form method="POST" action="/createNewUser" class="pt-3">
                 <div class="form-group row">
                     <label for="example-text-input" class="col-2 col-form-label">Your Email</label>

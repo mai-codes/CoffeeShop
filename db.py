@@ -150,7 +150,7 @@ class Database:
             return ""
         else:
             return "Permission Denied" #Tried to add an order for a user. Dangerous if allowed because of fraud.
-    
+
     def get_user(self, username):
         data = self.select(
             'SELECT * FROM user WHERE username=?', [username])
