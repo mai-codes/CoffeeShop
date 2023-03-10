@@ -16,17 +16,53 @@
     </head>
 
     <body>
+        <!-- Top header -->
+        <div class="w3-top">
+            <div class="w3-white w3-xlarge" style="max-width:1200px;margin:auto">
+            <div class="w3-left w3-padding-16"><a href="/" class="w3-bar-item w3-button w3-right">Home</a></div>
+            <div class="w3-center w3-padding-16 dragon-drinks-title"><a href="/"class="w3-bar-item w3-button">Dragon Drinks</a></div>
+            </div>
+        </div>
+
         <div class="w3-main w3-content w3-padding" style="max-width:1200px;margin-top:100px">
             <div class="text-center">
                 <h1 class="jumbotron-heading">Welcome</h1>
                 <p class="lead text-muted">Please login below</p>
             </div>
-            <div class="login">
-                <p>Enter your user name: </p> <!--TODO-->
-                <p>Enter your password: </p> <!--TODO-->
-                <a href="/" class="btn btn-secondary my-2 mr-2">Submit</a> <!--TODO-->
+
+            {% if message %}
+            <div class="alert alert-danger">
+                {{ message }}
             </div>
-            <a href="/createNewUser" class="btn btn-secondary my-2 mr-2">Create a new account</a>
+            {% endif %}
+
+            <div class="login">
+                <form method="POST" action="/login" class="pt-3">
+                    <div class="form-group row">
+                        <label for="example-text-input" class="col-2 col-form-label">Username</label>
+                        <div class="col-4">
+                            <input class="form-control" type="text" name="username">
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <label for="example-text-input" class="col-2 col-form-label">Password</label>
+                        <div class="col-4">
+                            <input class="form-control" type="password" name="password">
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-2"></div>
+                        <br>
+                        <div class="col-4">
+                            <button type="submit" class="w3-button w3-light-grey">Submit</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <p>
+                Please log in with your credentials. If you are a new user, please
+                <a href="/createNewUser">create an account</a>.
+            </p>
         </div>
     </body>
 </html>
