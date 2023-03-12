@@ -1,5 +1,5 @@
 import sqlite3
-from datetime import datetime
+import datetime
 
 PATH = 'DBFiles/coffeeShop.db'
 
@@ -10,11 +10,16 @@ class Database:
     def execute(self, sql, parameters=[]):
         c = self.conn.cursor()
         c.execute(sql, parameters)
+        return self.conn.commit()
+
+    def select(self, sql, parameters=[]):
+        c = self.conn.cursor()
+        c.execute(sql, parameters)
         return c.fetchall()
     
     def getPermissions(self, accessID):
         if(accessID >= 0):
-            data = self.execute( 'SELECT Type FROM User WHERE ID=?', [accessID])
+            data = self.select( 'SELECT Type FROM User WHERE ID=?', [accessID])
             
             if( len(data) == 0):
                 return -1 #something went wrong
@@ -34,7 +39,7 @@ class Database:
         # note that only name, image, and available are neccessary now but the other may be used in later assignments.
         # order by length of the number then by text. This way, b10 will not appear second when b2 should appear instead.
 
-        data = self.execute( 'SELECT * FROM Item ORDER BY Name ASC LIMIT ? OFFSET ?', [n, offset])
+        data = self.select( 'SELECT * FROM Item ORDER BY Name ASC LIMIT ? OFFSET ?', [n, offset])
         return [{
             'id': d[0],
             'type': d[1],
@@ -78,8 +83,8 @@ class Database:
                                 'FROM CartItem '\
                                 'INNER JOIN Item ON Item.ID=CartItem.ItemID '\
                                 'WHERE CartItem.UserID=?'
-            
-            data = self.execute( command, [userID])
+            print(command)
+            data = self.select( command, [userID])
             
             return [{
                 'cartItemCount': d[0],
@@ -96,7 +101,7 @@ class Database:
     #get all orders from user
     def apiGetOrders(self, accessID, userID):
         if(self.getPermissions(accessID) >= 1 or accessID==userID and accessID != -1 and userID != -1):
-            data = self.execute('SELECT OrderInfo.ID, OrderInfo.Date, OrderItem.Count, Item.Name, Item.Price, Item.Image '\
+            data = self.select('SELECT OrderInfo.ID, OrderInfo.Date, OrderItem.Count, Item.Name, Item.Price, Item.Image '\
                                 'FROM OrderInfo '\
                                 'INNER JOIN OrderItem ON OrderInfo.ID=OrderItem.OrderID '\
                                 'INNER JOIN Item ON Item.ID=OrderItem.ItemID '\
@@ -119,7 +124,7 @@ class Database:
     
     def apiGetAllOrders(self, accessID):
         if(self.getPermissions(accessID) >= 1 and accessID != -1):
-            data = self.execute('SELECT OrderInfo.ID, OrderInfo.Date, OrderItem.Count, Item.Name, Item.Price, Item.Image '\
+            data = self.select('SELECT OrderInfo.ID, OrderInfo.Date, OrderItem.Count, Item.Name, Item.Price, Item.Image '\
                                 'FROM OrderInfo '\
                                 'INNER JOIN OrderItem ON OrderInfo.ID=OrderItem.OrderID '\
                                 'INNER JOIN Item ON Item.ID=OrderItem.ItemID ORDER BY OrderInfo.Date DESC')
@@ -163,8 +168,8 @@ class Database:
 
             # add all items in the cart to the order and remove them from the cart
             # sqlite has the function last_insert_rowid(). Should be specific to this connection/session. If not, a select will do just fine. Don't know how to use it in python though.
-            data = self.execute('SELECT ID From OrderInfo WHERE UserID=? ORDER BY ID DESC', [userID])
-            
+            data = self.select('SELECT ID From OrderInfo WHERE UserID=? ORDER BY ID DESC', [userID])
+
             #add all from cart
             self.execute('INSERT INTO OrderItem (OrderID, ItemID, Count) '\
                          'SELECT ?, ci.ItemID, ci.Count FROM CartItem as ci WHERE ci.UserID=?', [data[0][0], userID])
@@ -187,7 +192,7 @@ class Database:
     
     def apiGetPendingOrders(self, accessID):
         if(self.getPermissions(accessID) >= 1):
-            data = self.execute("SELECT * FROM OrderInfo WHERE Status='Pending'")
+            data = self.select("SELECT * FROM OrderInfo WHERE Status='Pending'")
 
             #Not including status message since that is mostly for the customer so they know why their order was canceled.
             return [{
@@ -243,5 +248,26 @@ class Database:
                 'Reason': 'Invalid Permissions or Order ID'
             }
         
+            return "Permission Denied" #Tried to add an order for a user. Dangerous if allowed because of fraud.
+
+    def get_user(self, username):
+        data = self.select(
+            'SELECT * FROM user WHERE username=?', [username])
+        if data:
+            d = data[0]
+            return {
+                'id': d[0],
+                'userType': d[1],
+                'email': d[2],
+                'username': d[3],
+                'EncryptPass': d[4]
+            }
+        else:
+            return None
+    
+    def create_user(self, email, username, EncryptPass, userType):
+        self.execute('INSERT INTO user (Type, Email, Username, EncryptPass) VALUES (?, ?, ?, ?)',
+                     [userType, email, username, EncryptPass])
+    
     def close(self):
         self.conn.close()

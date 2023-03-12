@@ -15,16 +15,67 @@
         <script src="/static/lib/popper/popper.min.js"></script>
     </head>
     <body>
+        
+        <!-- Top header -->
+        <div class="w3-top">
+            <div class="w3-white w3-xlarge" style="max-width:1200px;margin:auto">
+            <div class="w3-right w3-padding-16"><a href="/login" class="w3-bar-item w3-button w3-right">Login</a></div>
+            <div class="w3-center w3-padding-16 dragon-drinks-title"><a href="/"class="w3-bar-item w3-button">Dragon Drinks</a></div>
+            </div>
+        </div>
+
         <div class="w3-main w3-content w3-padding" style="max-width:1200px;margin-top:100px">
-            <div class="text-center">
-                <h1 class="jumbotron-heading">Create a new user account</h1>
-                <p class="lead text-muted">Fill in the information below:</p>
+            <h1>Create User</h1>
+
+            <p>
+                Please specify a new username and password below.
+            </p>
+
+            {% if message %}
+            <div class="w3-panel w3-red w3-display-container">
+                <span onclick="this.parentElement.style.display='none'"
+                class="w3-button w3-large w3-display-topright">&times;</span>
+                <p>{{ message }}</p>
             </div>
-            <div>
-                <p>Enter your user name: </p> <!--TODO-->
-                <p>Enter your password: </p> <!--TODO-->
-                <a href="/login" class="btn btn-secondary my-2 mr-2">Submit</a> <!--TODO-->
-            </div>
+            {% endif %}
+
+            <form method="POST" action="/createNewUser" class="pt-3">
+                <div class="form-group row">
+                    <label for="example-text-input" class="col-2 col-form-label">Your Email</label>
+                    <div class="col-4">
+                        <input class="form-control" type="text" name="email">
+                    </div>
+                </div>
+                <div class="form-group row">
+                    <label for="example-text-input" class="col-2 col-form-label">Username</label>
+                    <div class="col-4">
+                        <input class="form-control" type="text" name="username">
+                    </div>
+                </div>
+                <div class="form-group row">
+                    <label for="example-text-input" class="col-2 col-form-label">Password</label>
+                    <div class="col-4">
+                        <input class="form-control" type="password" name="password">
+                    </div>
+                </div>
+                <div class="form-group row">
+                    <label for="userType" class="col-2 col-form-label">User Type:</label>
+                    <div class="col-4">
+                        <select id="userType" name="userType">
+                          <option value="CUSTOMER">Customer</option>
+                          <option value="BARISTA">Barista</option>
+                          <option value="MANAGER">Manager</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-2"></div>
+                    <br>
+                    <div class="col-4">
+                        <button type="submit" class="w3-button w3-light-grey">Submit</button>
+                    </div>
+                </div>
+            </form>
         </div>
 
     </body>

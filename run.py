@@ -1,9 +1,13 @@
 import os
 
-from flask import Flask, g, json, render_template, request
+from datetime import datetime
+from flask import Flask, g, json, render_template, request, redirect, session
+from passlib.hash import pbkdf2_sha256
 from db import Database
 
 app = Flask(__name__)
+app.secret_key = b'topsecretkeydontshare!'
+
 
 # Copied from the lecture slides.
 def get_db():
@@ -112,6 +116,42 @@ def apiCancelOrder():
     result = get_db().apiCancelOrder(accessID, userID, orderID, message)
     return json.jsonify(result)
 
+@app.route('/createNewUser', methods=['GET', 'POST'])
+def createNewUser():
+    message = None
+    if request.method == 'POST':
+        email = request.form.get('email')
+        username = request.form.get('username')
+        typed_password = request.form.get('password')
+        user_type = request.form.get('userType')
+        if email and username and typed_password and user_type:
+            encrypted_password = pbkdf2_sha256.hash(typed_password)
+            get_db().create_user(email, username, encrypted_password, user_type)
+            return redirect('/login')
+        else:
+            message = "All fields are required, please try again."
+    return render_template('createNewUser.html', message=message)
+
+@app.route('/login', methods=['GET', 'POST'])
+def login():
+    message = None
+    if request.method == 'POST':
+        username = request.form.get('username')
+        typed_password = request.form.get('password')
+        if username and typed_password:
+            user = get_db().get_user(username)
+            if user:
+                if pbkdf2_sha256.verify(typed_password, user["EncryptPass"]):
+                    session['user'] = user
+                    return redirect('/')
+                else:
+                    message = "Incorrect password, please try again"
+            else:
+                message = "Unknown user, please try again"
+        else:
+            message = "Invalid login, please try again"
+    return render_template('login.html', message=message)
+
 @app.route('/')
 def home():
     return render_template('home.html')
@@ -127,14 +167,6 @@ def orderHistory():
 @app.route('/userInfo')
 def userInfo():
     return render_template('userInfo.html')
-
-@app.route('/login')
-def login():
-    return render_template('login.html')
-
-@app.route('/createNewUser')
-def createNewUser():
-    return render_template('createNewUser.html')
 
 @app.route('/test')
 def testPage():
