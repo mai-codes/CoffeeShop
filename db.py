@@ -1,4 +1,5 @@
 import sqlite3
+from datetime import datetime
 
 PATH = 'DBFiles/coffeeShop.db'
 
@@ -46,16 +47,29 @@ class Database:
     def apiAddItem(self, accessID, itemType, itemName, itemPrice, itemImage, itemDescription):
         if(self.getPermissions(accessID) >= 1 and accessID != -1):
             data = self.execute( 'INSERT INTO ITEM (Type, Name, Price, Image, Description) VALUES (?, ?, ?, ?, ?)', [itemType, itemName, itemPrice, itemImage, itemDescription])
-            return "" #should return if successful or not
+            
+            #Should check if it actually updated to give valid or useful information
+            return {
+                'Status': 'Successful'
+            }
         else:
-            return "Permission Denied"
+            return {
+                'Status': 'Failed',
+                'Reason': 'Invalid Permissions'
+            }
 
     def apiDeleteItem(self, accessID, itemID):
         if(self.getPermissions(accessID) >= 1 and accessID != -1):
             data = self.execute( 'DELETE FROM Item WHERE id=?', [itemID])
-            return "" #should return if successful or not
+            #Should check if it actually updated to give valid or useful information
+            return {
+                'Status': 'Successful'
+            }
         else:
-            return "Permission Denied"
+            return {
+                'Status': 'Failed',
+                'Reason': 'Invalid Permissions'
+            }
     
     #get items in the cart for user
     def apiGetCart(self, accessID, userID):
@@ -64,7 +78,7 @@ class Database:
                                 'FROM CartItem '\
                                 'INNER JOIN Item ON Item.ID=CartItem.ItemID '\
                                 'WHERE CartItem.UserID=?'
-            print(command)
+            
             data = self.execute( command, [userID])
             
             return [{
@@ -74,7 +88,10 @@ class Database:
                 'itemImage': d[3]
             } for d in data]
         else:
-            return "Permission Denied" #Tried to access the cart of another user and is not the manager
+            return {
+                'Status': 'Failed',
+                'Reason': 'Invalid Permissions'
+            }
     
     #get all orders from user
     def apiGetOrders(self, accessID, userID):
@@ -95,7 +112,10 @@ class Database:
                 'itemImage': d[5]
             } for d in data]
         else:
-            return "Permission Denied" #Tried to access the orders of users and is not an employee
+            return {
+                'Status': 'Failed',
+                'Reason': 'Invalid Permissions'
+            }
     
     def apiGetAllOrders(self, accessID):
         if(self.getPermissions(accessID) >= 1 and accessID != -1):
@@ -113,36 +133,115 @@ class Database:
                 'itemImage': d[5]
             } for d in data]
         else:
-            return "Permission Denied" #Tried to access the orders of users and is not an employee
+            return {
+                'Status': 'Failed',
+                'Reason': 'Invalid Permissions'
+            }
     
     def apiAddToCart(self, accessID, userID, itemID, count):
-        if(self.getPermissions(accessID) >= 2 or accessID==userID and accessID != -1 and userID != -1):
+        if((self.getPermissions(accessID) >= 2 or accessID==userID) and accessID != -1 and userID != -1):
             # Should check if it already exist. If so, update instead of insert
             data = self.execute('INSERT INTO CartItem (UserID, ItemID, Count) VALUES (?, ?, ?)', [userID, itemID, count])
-            return "" #Should return if successful
+            
+            #Should check if it actually updated to give valid or useful information
+            return {
+                'Status': 'Successful'
+            }
         else:
-            return "Permission Denied" #Tried to access the orders of users and is not an employee
+            return {
+                'Status': 'Failed',
+                'Reason': 'Invalid Permissions'
+            }
     
     #Research Transactions in sqlite. They should be used here to add pending orders
-    def apiAddOrder(self, accessID, userID):
+    def apiCreateOrder(self, accessID, userID):
         if(accessID == userID and accessID != -1):
+
             dateFormat = '%Y-%m-%d %I:%M %p'
             dateString = datetime.now().strftime(dateFormat)
-            data = self.execute('INSERT INTO OrderInfo (UserID, Date) VALUES (?, ?)', [userID, dateString])
+            data = self.execute("INSERT INTO OrderInfo (UserID, Date, Status) VALUES (?, ?, 'Pending')", [userID, dateString])
 
             # add all items in the cart to the order and remove them from the cart
             # sqlite has the function last_insert_rowid(). Should be specific to this connection/session. If not, a select will do just fine. Don't know how to use it in python though.
             data = self.execute('SELECT ID From OrderInfo WHERE UserID=? ORDER BY ID DESC', [userID])
-
+            
             #add all from cart
             self.execute('INSERT INTO OrderItem (OrderID, ItemID, Count) '\
                          'SELECT ?, ci.ItemID, ci.Count FROM CartItem as ci WHERE ci.UserID=?', [data[0][0], userID])
-
+            
             #remove from the cart
             self.execute('DELETE FROM CartItem WHERE UserID=?', [userID])
 
-            return ""
+            #!Should send email confirmation here if we have time.
+
+            #Should check if it actually updated to give valid or useful information
+            return {
+                'Status': 'Successful'
+            }
         else:
-            return "Permission Denied" #Tried to add an order for a user. Dangerous if allowed because of fraud.
+            #Tried to add an order for a user. Dangerous if allowed because of fraud.
+            return {
+                'Status': 'Failed',
+                'Reason': 'Invalid Permissions'
+            }
+    
+    def apiGetPendingOrders(self, accessID):
+        if(self.getPermissions(accessID) >= 1):
+            data = self.execute("SELECT * FROM OrderInfo WHERE Status='Pending'")
+
+            #Not including status message since that is mostly for the customer so they know why their order was canceled.
+            return [{
+                'OrderID': d[0],
+                'UserID': d[1],
+                'Status': d[2],
+                'Date': d[3]
+            } for d in data]
+        else:
+            return {
+                'Status': 'Failed',
+                'Reason': 'Invalid Permissions'
+            }
+
+    def apiApproveOrder(self, accessID, orderID):
+        if(self.getPermissions(accessID) >= 1 and orderID != -1):
+            self.execute("UPDATE OrderInfo SET Status='Approved' WHERE ID=?", [orderID])
+
+            #!Should send email confirmation here if we have time.
+
+            #Should check if it actually updated to give valid or useful information
+            return {
+                'Status': 'Successful'
+            }
+        else:
+            return {
+                'Status': 'Failed',
+                'Reason': 'Invalid Permissions or Order ID'
+            }
+    
+    def apiCancelOrder(self, accessID, userID, orderID, message):
+        if((self.getPermissions(accessID) >= 1 or accessID==userID) and orderID != -1 and accessID != -1):
+
+            #Message provided by barista/manager or if user, then the message 'User Submitted' or something
+            #May be better to just delete the order entirely. It does not hurt to keep it along with the reason though so the default will be to keep them.
+            
+            if(self.getPermissions(accessID) >= 1):
+                #can update any order
+                self.execute("UPDATE OrderInfo SET Status='Canceled', StatusMessage=? WHERE ID=?", [message, orderID])
+            else:
+                #Can only update orders that belong to the user.
+                self.execute("UPDATE OrderInfo SET Status='Canceled', StatusMessage=? WHERE ID=? AND UserID=?", [message, orderID, userID])
+
+            #!Should send email confirmation here if we have time.
+
+            #Should check if it actually updated to give valid or useful information
+            return {
+                'Status': 'Successful'
+            }
+        else:
+            return {
+                'Status': 'Failed',
+                'Reason': 'Invalid Permissions or Order ID'
+            }
+        
     def close(self):
         self.conn.close()

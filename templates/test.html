@@ -1,0 +1,77 @@
+{% extends 'base.html' %}
+{% set active = "Test" %}
+
+{% block title %}
+Test
+{% endblock %}
+
+{% block header %}
+<script>
+	function addToCartFunction()
+	{
+		var accessID = document.getElementById("AccessID").value;
+		var userID = document.getElementById("UserID").value;
+		var itemID = document.getElementById("ItemID").value;
+		var count = document.getElementById("CountID").value;
+		
+		$.post("/api/addToCart", {
+			accessID: accessID,
+			id: userID,
+			itemID: itemID,
+			count: count
+		}, function(result) {
+			//Result is the return from the post which is empty now.
+			console.log(result);
+		});
+	}
+
+	function addOrderFunction()
+	{
+		var accessID = document.getElementById("AccessID").value;
+		var userID = document.getElementById("UserID").value;
+		
+		$.post("/api/addOrder", {
+			accessID: accessID,
+			id: userID
+		});
+	}
+
+	function deleteItemFunction()
+	{
+		var accessID = document.getElementById("AccessID").value;
+		var userID = document.getElementById("UserID").value;
+		var itemID = document.getElementById("ItemID").value;
+		
+		$.post("/api/deleteItem", {
+			accessID: accessID,
+			id: userID,
+			itemID: itemID
+		});
+	}
+</script>
+{% endblock %}
+
+{% block content %}
+<!-- Lazy approach to a test page -->
+<div class="w3-container w3-padding-32 w3-center">  
+	<!-- <form> -->
+		<label for="AccessID">AccessID:</label><br/>
+		<input type="text" id="AccessID" name="AccessID" value="-1"/><br/>
+		<label for="UserID">UserID:</label><br/>
+		<input type="text" id="UserID" name="UserID" value="-1"/><br/>
+		
+		<!-- AddToCart -->
+		<label for="ItemID">ItemID:</label><br/>
+		<input type="text" id="ItemID" name="ItemID" value="-1"/><br/>
+		<label for="CountID">Count:</label><br/>
+		<input type="text" id="CountID" name="CountID" value="0"/><br/>
+		<button onclick="addToCartFunction()">Add To Cart</button>
+		<!-- AddOrder -->
+		<button onclick="addOrderFunction()">Add Order</button>
+		<!-- Delete Item -->
+		<button onclick="deleteItemFunction()">Delete Item</button>
+	<!-- </form> -->
+
+</div>
+
+{% endblock %}

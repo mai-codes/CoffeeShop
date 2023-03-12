@@ -13,7 +13,9 @@ CREATE TABLE User (
 CREATE TABLE OrderInfo (
 	ID INTEGER PRIMARY KEY,
 	UserID INTEGER NOT NULL,
-	Date DATETIME
+	Status TEXT NOT NULL,		--Status (Accepted, Processing, Canceled, etc.)
+	Date DATETIME,
+	StatusMessage Text		--Status Message Reason for failure
 );
 
 -- Some item that can be ordered.
