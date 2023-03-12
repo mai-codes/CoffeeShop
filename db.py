@@ -77,13 +77,13 @@ class Database:
             }
     
     #get items in the cart for user
-    def apiGetCart(self, accessID, userID):
-        if(self.getPermissions(accessID) >= 2 or accessID==userID and accessID != -1 and userID != -1):
+    def apiGetCart(self, userID):
+        if(userID != -1):
             command = 'SELECT CartItem.Count, Item.Name, Item.Price, Item.Image '\
                                 'FROM CartItem '\
                                 'INNER JOIN Item ON Item.ID=CartItem.ItemID '\
                                 'WHERE CartItem.UserID=?'
-            print(command)
+            
             data = self.select( command, [userID])
             
             return [{
@@ -144,7 +144,7 @@ class Database:
             }
     
     def apiAddToCart(self, accessID, userID, itemID, count):
-        if((self.getPermissions(accessID) >= 2 or accessID==userID) and accessID != -1 and userID != -1):
+        if(userID != -1):
             # Should check if it already exist. If so, update instead of insert
             data = self.execute('INSERT INTO CartItem (UserID, ItemID, Count) VALUES (?, ?, ?)', [userID, itemID, count])
             
@@ -159,8 +159,8 @@ class Database:
             }
     
     #Research Transactions in sqlite. They should be used here to add pending orders
-    def apiCreateOrder(self, accessID, userID):
-        if(accessID == userID and accessID != -1):
+    def apiCreateOrder(self, userID):
+        if(userID != -1):
 
             dateFormat = '%Y-%m-%d %I:%M %p'
             dateString = datetime.now().strftime(dateFormat)
@@ -250,6 +250,19 @@ class Database:
         
             return "Permission Denied" #Tried to add an order for a user. Dangerous if allowed because of fraud.
 
+    def apiSetUserToEmployee(self, accessID, userID):
+        if(self.getPermissions(accessID) >= 2):
+            self.execute("UPDATE User SET Type=? WHERE ID=?", ['BARISTA', userID])
+            #Should check if it actually updated to give valid or useful information
+            return {
+                'Status': 'Successful'
+            }
+        else:
+            return {
+                'Status': 'Failed',
+                'Reason': 'Invalid Permissions'
+            }
+        
     def get_user(self, username):
         data = self.select(
             'SELECT * FROM user WHERE username=?', [username])

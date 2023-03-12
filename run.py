@@ -35,27 +35,34 @@ def apiGetItems():
 
 @app.route('/api/getCart', methods=['GET'])
 def apiGetCart():
-    accessID = int(request.args.get('accessID', default=-1)) #negative id. Probably should use a better way to get the current users id.
-    id = int(request.args.get('id', default=-1)) #negative id should not exist
-    cartItems = get_db().apiGetCart(accessID, id)
+    userID = -1
+    if(session['user'] != None):
+        userID = int(session['user']['id']) #can get from the session variable.
+    cartItems = get_db().apiGetCart(userID)
     return json.jsonify(cartItems)
 
 @app.route('/api/getOrders', methods=['GET'])
 def apiGetOrders():
-    accessID = int(request.args.get('accessID', default=-1)) #negative id. Probably should use a better way to get the current users id.
-    id = int(request.args.get('id', default=-1)) #negative id should not exist
-    ordersInfo = get_db().apiGetOrders(accessID, id)
+    accessID = -1
+    if(session['user'] != None):
+        accessID = int(session['user']['id']) #can get from the session variable.
+    userID = int(request.args.get('userID', default=-1)) #negative id should not exist
+    ordersInfo = get_db().apiGetOrders(accessID, userID)
     return json.jsonify(ordersInfo)
 
 @app.route('/api/getAllOrders', methods=['GET'])
 def apiGetAllOrders():
-    accessID = int(request.args.get('accessID', default=-1)) #negative id. Probably should use a better way to get the current users id.
+    accessID = -1
+    if(session['user'] != None):
+        accessID = int(session['user']['id']) #can get from the session variable.
     ordersInfo = get_db().apiGetAllOrders(accessID)
     return json.jsonify(ordersInfo)
 
 @app.route('/api/getPendingOrders', methods=['GET'])
 def apiGetPendingOrders():
-    accessID = int(request.args.get('accessID', default=-1)) #negative id. Probably should use a better way to get the current users id.
+    accessID = -1
+    if(session['user'] != None):
+        accessID = int(session['user']['id']) #can get from the session variable.
     ordersInfo = get_db().apiGetPendingOrders(accessID)
     return json.jsonify(ordersInfo)
 
@@ -65,25 +72,30 @@ def apiGetPendingOrders():
 
 @app.route('/api/addToCart', methods=['POST'])
 def apiAddToCart():
-    accessID = int(request.form.get('accessID', default=-1)) #negative id. Probably should use a better way to get the current users id.
-    id = int(request.form.get('id', default=-1)) #negative id should not exist
+    userID = -1
+    if(session['user'] != None):
+        userID = int(session['user']['id']) #can get from the session variable.
+
     itemID = int(request.form.get('itemID', default=-1)) #negative id should not exist
     count = int(request.form.get('count', default=0))
 
-    result = get_db().apiAddToCart(accessID, id, itemID, count)
+    result = get_db().apiAddToCart(userID, itemID, count)
     return json.jsonify(result)
 
 @app.route('/api/createOrder', methods=['POST'])
 def apiCreateOrder():
-    accessID = int(request.form.get('accessID', default=-1)) #negative id. Probably should use a better way to get the current users id.
-    id = int(request.form.get('id', default=-1)) #negative id should not exist
+    userID = -1
+    if(session['user'] != None):
+        userID = int(session['user']['id']) #can get from the session variable.
 
-    result = get_db().apiCreateOrder(accessID, id)
+    result = get_db().apiCreateOrder(userID)
     return json.jsonify(result)
 
 @app.route('/api/addItem', methods=['POST'])
 def apiAddItem():
-    accessID = int(request.form.get('accessID', default=-1)) #negative id. Probably should use a better way to get the current users id.
+    accessID = -1
+    if(session['user'] != None):
+        accessID = int(session['user']['id']) #can get from the session variable.
     itemType = int(request.form.get('itemType', default=0)) #0 == coffee, 1 == tea. Just for sorting purposes
     name = int(request.form.get('name', default='N/A'))
     price = int(request.form.get('price', default=0.00))
@@ -95,21 +107,27 @@ def apiAddItem():
 
 @app.route('/api/deleteItem', methods=['POST']) #changed to post since delete is not suppose to have a body and jquery does not have $.delete()
 def apiDeleteItem():
-    accessID = int(request.form.get('accessID', default=-1)) #negative id. Probably should use a better way to get the current users id.
+    accessID = -1
+    if(session['user'] != None):
+        accessID = int(session['user']['id']) #can get from the session variable.
     id = int(request.form.get('itemID', default=-1)) #negative id should not exist
     result = get_db().apiDeleteItem(accessID, id)
     return json.jsonify(result)
 
-@app.route('api/approveOrder', methods=['POST'])
+@app.route('/api/approveOrder', methods=['POST'])
 def apiApproveOrder():
-    accessID = int(request.form.get('accessID', default=-1)) #negative id. Probably should use a better way to get the current users id.
+    accessID = -1
+    if(session['user'] != None):
+        accessID = int(session['user']['id']) #can get from the session variable.
     orderID = int(request.form.get('orderID', default=-1)) #negative id should not exist
     result = get_db().apiApproveOrder(accessID, orderID)
     return json.jsonify(result)
 
-@app.route('api/cancelOrder', methods=['POST'])
+@app.route('/api/cancelOrder', methods=['POST'])
 def apiCancelOrder():
-    accessID = int(request.form.get('accessID', default=-1)) #negative id. Probably should use a better way to get the current users id.
+    accessID = -1
+    if(session['user'] != None):
+        accessID = int(session['user']['id']) #can get from the session variable.
     userID = int(request.form.get('userID', default=-1))
     orderID = int(request.form.get('orderID', default=-1)) #negative id should not exist
     message = int(request.form.get('message', default='User Requested'))
@@ -152,6 +170,12 @@ def login():
             message = "Invalid login, please try again"
     return render_template('login.html', message=message)
 
+@app.route('/logout', methods=['GET'])
+def logout():
+    #drop session cookie
+    session['user'] = None
+    #redirect to home
+    return redirect('/')
 @app.route('/')
 def home():
     return render_template('home.html')
@@ -167,6 +191,10 @@ def orderHistory():
 @app.route('/userInfo')
 def userInfo():
     return render_template('userInfo.html')
+
+@app.route('/cart')
+def cart():
+    return render_template('cart.html')
 
 @app.route('/test')
 def testPage():
