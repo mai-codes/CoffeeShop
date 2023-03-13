@@ -12,8 +12,8 @@ Order
 {% block content %}
 <div class="w3-container">
     <div class="w3-padding-32 w3-center">
-        {% if session['user'] %}
-        <h1>Welcome {{ session['user']['username'] }}, place your order below:</h1>
+        {% if session %}
+        <h1>Hi {{ session.userinfo.name }}, place your order below:</h1>
         <a href="/cart" class="w3-button w3-light-grey">View Cart</a>
         <br>
         {% else %}

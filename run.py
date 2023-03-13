@@ -1,13 +1,35 @@
 import os
 
 from datetime import datetime
-from flask import Flask, g, json, render_template, request, redirect, session
+from flask import Flask, g, json, jsonify, render_template, request, redirect, session, url_for
+from flask_cors import cross_origin
 from passlib.hash import pbkdf2_sha256
 from db import Database
+from auth import AuthError, requires_auth
+from dotenv import find_dotenv, load_dotenv
+from os import environ as env
+from authlib.integrations.flask_client import OAuth
+from urllib.parse import quote_plus, urlencode
+
+ENV_FILE = find_dotenv()
+if ENV_FILE:
+    load_dotenv(ENV_FILE)
 
 app = Flask(__name__)
-app.secret_key = b'topsecretkeydontshare!'
+# app.secret_key = b'topsecretkeydontshare!'
+app.secret_key = env.get("APP_SECRET_KEY")
 
+oauth = OAuth(app)
+
+oauth.register(
+    "auth0",
+    client_id=env.get("AUTH0_CLIENT_ID"),
+    client_secret=env.get("AUTH0_CLIENT_SECRET"),
+    client_kwargs={
+        "scope": "openid profile email",
+    },
+    server_metadata_url=f'https://{env.get("AUTH0_DOMAIN")}/.well-known/openid-configuration'
+)
 
 # Copied from the lecture slides.
 def get_db():
@@ -134,72 +156,116 @@ def apiCancelOrder():
     result = get_db().apiCancelOrder(accessID, userID, orderID, message)
     return json.jsonify(result)
 
-@app.route('/createNewUser', methods=['GET', 'POST'])
-def createNewUser():
-    message = None
-    if request.method == 'POST':
-        email = request.form.get('email')
-        username = request.form.get('username')
-        typed_password = request.form.get('password')
-        user_type = request.form.get('userType')
-        if email and username and typed_password and user_type:
-            encrypted_password = pbkdf2_sha256.hash(typed_password)
-            get_db().create_user(email, username, encrypted_password, user_type)
-            return redirect('/login')
-        else:
-            message = "All fields are required, please try again."
-    return render_template('createNewUser.html', message=message)
+# @app.route('/createNewUser', methods=['GET', 'POST'])
+# def createNewUser():
+#     message = None
+#     if request.method == 'POST':
+#         email = request.form.get('email')
+#         username = request.form.get('username')
+#         typed_password = request.form.get('password')
+#         user_type = request.form.get('userType')
+#         if email and username and typed_password and user_type:
+#             encrypted_password = pbkdf2_sha256.hash(typed_password)
+#             get_db().create_user(email, username, encrypted_password, user_type)
+#             return redirect('/login')
+#         else:
+#             message = "All fields are required, please try again."
+#     return render_template('createNewUser.html', message=message)
 
-@app.route('/login', methods=['GET', 'POST'])
+# @app.route('/login', methods=['GET', 'POST'])
+# def login():
+#     message = None
+#     if request.method == 'POST':
+#         username = request.form.get('username')
+#         typed_password = request.form.get('password')
+#         if username and typed_password:
+#             user = get_db().get_user(username)
+#             if user:
+#                 if pbkdf2_sha256.verify(typed_password, user["EncryptPass"]):
+#                     session['user'] = user
+#                     return redirect('/')
+#                 else:
+#                     message = "Incorrect password, please try again"
+#             else:
+#                 message = "Unknown user, please try again"
+#         else:
+#             message = "Invalid login, please try again"
+#     return render_template('login.html', message=message)
+
+# @app.route('/logout', methods=['GET'])
+# def logout():
+#     #drop session cookie
+#     session['user'] = None
+#     #redirect to home
+#     return redirect('/')
+
+@app.route("/login")
 def login():
-    message = None
-    if request.method == 'POST':
-        username = request.form.get('username')
-        typed_password = request.form.get('password')
-        if username and typed_password:
-            user = get_db().get_user(username)
-            if user:
-                if pbkdf2_sha256.verify(typed_password, user["EncryptPass"]):
-                    session['user'] = user
-                    return redirect('/')
-                else:
-                    message = "Incorrect password, please try again"
-            else:
-                message = "Unknown user, please try again"
-        else:
-            message = "Invalid login, please try again"
-    return render_template('login.html', message=message)
+    return oauth.auth0.authorize_redirect(
+        redirect_uri=url_for("callback", _external=True),
+         audience='coffee'
+    )
 
-@app.route('/logout', methods=['GET'])
+@app.route("/callback", methods=["GET", "POST"])
+def callback():
+    token = oauth.auth0.authorize_access_token()
+    access = token.get('access_token', None)
+    text_file = open("token.txt", "w")
+    text_file.write(access)
+    text_file.close()
+    # print(access)
+    session["user"] = token
+    return redirect("/")
+
+@app.route("/logout")
 def logout():
-    #drop session cookie
-    session['user'] = None
-    #redirect to home
-    return redirect('/')
+    session.clear()
+    return redirect(
+        "https://" + env.get("AUTH0_DOMAIN")
+        + "/v2/logout?"
+        + urlencode(
+            {
+                "returnTo": url_for("home", _external=True),
+                "client_id": env.get("AUTH0_CLIENT_ID"),
+            },
+            quote_via=quote_plus,
+        )
+    )
+
+    
 @app.route('/')
 def home():
-    return render_template('home.html')
+    return render_template('home.html', session=session.get('user'), pretty=json.dumps(session.get('user'), indent=4))
 
 @app.route('/order')
 def order():
-    return render_template('order.html')
+    return render_template('order.html', session=session.get('user'), pretty=json.dumps(session.get('user'), indent=4))
 
 @app.route('/orderHistory')
 def orderHistory():
-    return render_template('orderHistory.html')
+    return render_template('orderHistory.html', session=session.get('user'), pretty=json.dumps(session.get('user'), indent=4))
 
 @app.route('/userInfo')
 def userInfo():
-    return render_template('userInfo.html')
+    return render_template('userInfo.html', session=session.get('user'), pretty=json.dumps(session.get('user'), indent=4))
 
 @app.route('/cart')
 def cart():
-    return render_template('cart.html')
+    return render_template('cart.html', session=session.get('user'), pretty=json.dumps(session.get('user'), indent=4))
 
-@app.route('/test')
-def testPage():
-    return render_template('test.html')
+@app.route('/barista')
+@requires_auth('post:drinks')
+def testPage(jwt):
+    return render_template('barista.html', session=session.get('user'), pretty=json.dumps(session.get('user'), indent=4))
 
+
+@app.errorhandler(AuthError)
+def handle_auth_error(ex):
+    return jsonify({
+        "success": False,
+        "error": ex.status_code,
+        'message': ex.error
+    }), 401
 
 if __name__ == '__main__':
-    app.run(host='localhost', port=8080, debug=True)
+    app.run(host='127.0.0.1', port=8080, debug=True)

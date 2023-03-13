@@ -1,22 +1,19 @@
 {% extends 'base.html' %}
-{% set active = "userInfo" %}
+{% set active = "barista" %}
 
 {% block title %}
-User Information
+Barista Settings
 {% endblock %}
 
 {% block content %}
 
 <section>
     <div class="w3-main w3-content w3-padding">
-        <h1>User Information</h1>
+        <h1>Barista Settings</h1>
         <br>
         <!-- Show user's information -->
         {% if session %}
-        <h2><strong>Username:</strong> {{ session.userinfo.email }}</h2>
-        <h2><strong>Full Name:</strong> {{ session.userinfo.name }}</h2>
-        <br>
-        <a href="/logout"class="w3-button w3-light-grey">Logout</a>
+        <h2><strong>Previously created drinks:</strong></h2>
         {% else %}
         <!-- Show link to login button -->
         <h2>To view user information please <a href="/login" >Login</a> . </h2>

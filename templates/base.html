@@ -25,10 +25,11 @@
             class="w3-bar-item w3-button">Close Menu</a>
             <a href="/" onclick="w3_close()" class="w3-bar-item w3-button">Home</a>
             <a href="/order" onclick="w3_close()" class="w3-bar-item w3-button">Place An Order</a>
-            <a href="/cart" onclick="w3_close()" class="w3-bar-item w3-button">View Cart</a>
+            <a href="/cart" onclick="w3_close()" class="w3-bar-item w3-button" *ngIf="auth.can('post:drinks')">View Cart</a>
             <a href="/orderHistory" onclick="w3_close()" class="w3-bar-item w3-button">View Order History</a>
             <a href="/userInfo" onclick="w3_close()" class="w3-bar-item w3-button">User Information</a>
-            {% if session['user'] %}
+            <a href="/barista" onclick="w3_close()" class="w3-bar-item w3-button">Barista Settings</a>
+            {% if session %}
             <!-- show logout button -->
             <a href="/logout" onclick="w3_close()" class="w3-bar-item w3-button">Logout</a>
             {% endif %}
@@ -38,9 +39,10 @@
         <div class="w3-top">
             <div class="w3-white w3-xlarge" style="max-width:1200px;margin:auto">
             <div class="w3-button w3-padding-16 w3-left" onclick="w3_open()">☰</div>
-            {% if session['user'] %}
+            {% if session  %}
             <!-- Show username -->
-            <p class="w3-right w3-padding-16 ">Hello {{ session['user']['username'] }}</p>
+            <img style="max-width:55px;margin:auto" class="w3-right w3-padding-16" src="{{ session.userinfo.picture }}">
+            <p class="w3-right w3-padding-16 "> Welcome back, {{ session.userinfo.name }}</p>
             {% else %}
             <!-- Show login button -->
             <div class="w3-right w3-padding-16"><a href="/login" class="w3-bar-item w3-button w3-right">Login</a></div>
