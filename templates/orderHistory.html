@@ -7,11 +7,35 @@ orderHistory
 
 {% block content %}
 
-<section class="jumbotron">
-    <div class="text-center">
-        <h1 class="jumbotron-heading">View Order Histroy</h1>
-        <p class="lead text-muted">View past orders here!</p>
+<div class="w3-container">
+    <div class="w3-padding-32 w3-center">
+        <!-- User is logged in  -->
+        {% if session['user'] %}
+        <h1>View Order Histroy</h1>
+        <a href="/order" class="w3-button w3-light-grey">Return to place an order</a>
+        <br>
+
+        <div id="pastOrdersList" class="container">
+            <script>
+    
+                $(() => {
+                    const orderHistoryView = new OrderHistoryView(10);
+                    orderHistoryView.load();
+                });
+            
+            </script>
+    
+        </div>
+        <!-- User is logged out  -->
+        {% else %}
+        <h1>View Order Histroy</h1><br>
+        <h2>To view past orders please <a href="/login" >Login</a>.</h2>
+        {% endif %}
     </div>
-</section>
+
+
+
+
+</div>
 
 {% endblock %}

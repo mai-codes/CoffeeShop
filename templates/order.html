@@ -12,8 +12,15 @@ Order
 {% block content %}
 <div class="w3-container">
     <div class="w3-padding-32 w3-center">
-        <h1 class="jumbotron-heading">Place an order</h1>
-        <p class="lead text-muted">View drinks to order here:</p>
+        {% if session['user'] %}
+        <h1>Welcome {{ session['user']['username'] }}, place your order below:</h1>
+        <a href="/cart" class="w3-button w3-light-grey">View Cart</a>
+        <br>
+        {% else %}
+        <!-- Show link to login button -->
+        <h1>Place an order</h1><br>
+        <h2>To place an order please <a href="/login" >Login</a>.</h2>
+        {% endif %}
     </div>
 
 
