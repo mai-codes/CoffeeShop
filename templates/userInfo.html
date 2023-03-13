@@ -10,10 +10,17 @@ User Information
 <section>
     <div class="w3-main w3-content w3-padding">
         <h1>User Information</h1>
-        <h2>User name:</h2>
-        <h2>User email:</h2>
-        <p>Change username</p>
-        <p>Change password</p>
+        <br>
+        <!-- Show user's information -->
+        {% if session['user'] %}
+        <h2><strong>User name:</strong> {{ session['user']['username'] }}</h2>
+        <h2><strong>User email:</strong> {{ session['user']['email'] }}</h2>
+        <h2><strong>User type:</strong> {{ session['user']['userType']}}</h2>
+        {% else %}
+        <!-- Show link to login button -->
+        <h2>To view user information please <a href="/login" >Login</a> . </h2>
+        {% endif %}
+
     </div>
 </section>
 

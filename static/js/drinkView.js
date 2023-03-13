@@ -11,19 +11,6 @@ function DrinkView(numDrinks) {
     this.updateDrinks = (drinks) => {
         $('#drinktable').empty();
         const table = $('<div class="w3-container drinkCards"></div>');
-        // const columnLabels = $(`
-        // <div class="card">
-        //     <div class="box>
-        //         <table class="w3-table">
-        //             <tr>
-        //                 <th>Name</th>
-        //                 <th>Image</th>
-        //                 <th>Price</th>
-        //             </tr>
-        //     </div>
-        // </div>
-        // `);
-        // $('#drinktable').append(columnLabels);
 
         for (let i = 0; i < numDrinks && i < drinks.length; i++) {
             const drink = drinks[i];
