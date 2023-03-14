@@ -16,7 +16,7 @@ class Database:
         c = self.conn.cursor()
         c.execute(sql, parameters)
         return c.fetchall()
-    
+
     def getPermissions(self, accessID):
         if(accessID >= 0):
             data = self.select( 'SELECT Type FROM User WHERE ID=?', [accessID])
@@ -50,31 +50,20 @@ class Database:
         } for d in data]
 
     def apiAddItem(self, accessID, itemType, itemName, itemPrice, itemImage, itemDescription):
-        if(self.getPermissions(accessID) >= 1 and accessID != -1):
-            data = self.execute( 'INSERT INTO ITEM (Type, Name, Price, Image, Description) VALUES (?, ?, ?, ?, ?)', [itemType, itemName, itemPrice, itemImage, itemDescription])
-            
-            #Should check if it actually updated to give valid or useful information
-            return {
-                'Status': 'Successful'
-            }
-        else:
-            return {
-                'Status': 'Failed',
-                'Reason': 'Invalid Permissions'
-            }
+        #Assuming permissions checked at prev layer, TODO add user id checks if needed
+        self.execute( 'INSERT INTO Item (Type, Name, Price, Image, Description) VALUES (?, ?, ?, ?, ?)', 
+                              [itemType, itemName, itemPrice, itemImage, itemDescription])
+        return {
+            'Status': 'Successful'
+        }
 
-    def apiDeleteItem(self, accessID, itemID):
-        if(self.getPermissions(accessID) >= 1 and accessID != -1):
-            data = self.execute( 'DELETE FROM Item WHERE id=?', [itemID])
-            #Should check if it actually updated to give valid or useful information
-            return {
-                'Status': 'Successful'
-            }
-        else:
-            return {
-                'Status': 'Failed',
-                'Reason': 'Invalid Permissions'
-            }
+    def apiDeleteItem(self,  id):
+        #Assuming permissions checked at prev layer, TODO add user id checks if needed
+        self.execute('DELETE FROM Item WHERE id=?', [id])
+        return {
+            'Status': 'Successful'
+        }
+            
     
     #get items in the cart for user
     def apiGetCart(self, userID):

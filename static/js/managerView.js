@@ -1,6 +1,7 @@
 function ManagerView(numDrinks) {
     this.update = (data) => {
         if (!Array.isArray(data)) {
+            console.error("data: ", data)
             console.error("Invalid data format, expected an array of drinks");
             return;
         }
@@ -16,8 +17,7 @@ function ManagerView(numDrinks) {
             const drink = drinks[i];
 
             const drinkRow = $(`
-            <div class="card-column">
-                <div class="w3-card-2">
+                <div class="w3-card-2 card-column">
                     <header class="w3-container w3-sand">
                         <h3>${drink.name}</h3>
                     </header>
@@ -30,10 +30,9 @@ function ManagerView(numDrinks) {
                 
                     <footer class="w3-container w3-sand">
                         <h5>${drink.price}</h5>
-                        <button class="w3-btn delete-button">Delete</button>
+                        <button class="w3-btn delete-button w3-text-red">Delete<i class="w3-margin-left fa fa-trash"></i></button>
                     </footer>
                 </div>
-            </div>
             `);
 
             $(drinkRow).find('.delete-button').on('click', _ => {
@@ -55,7 +54,6 @@ function ManagerView(numDrinks) {
             this.update(data);
         });
     }
-
 
     this.load = () => {
         $.get('/api/getItems', {}, (data) => {

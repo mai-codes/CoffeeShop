@@ -122,16 +122,21 @@ def apiAddItem():
     desc = int(request.form.get('description', default=''))
     
     result = get_db().apiAddItem(accessID, itemType, name, price, image, desc)
+    print("RESULT: ", result)
     return json.jsonify(result)
 
-@app.route('/api/deleteItem', methods=['POST']) #changed to post since delete is not suppose to have a body and jquery does not have $.delete()
+@app.route('/api/deleteItem', methods=['POST'])
 def apiDeleteItem():
     accessID = -1
     if(session['user'] != None):
-        accessID = int(session['user']['id']) #can get from the session variable.
-    id = int(request.form.get('itemID', default=-1)) #negative id should not exist
-    result = get_db().apiDeleteItem(accessID, id)
-    return json.jsonify(result)
+        accessID = int(1) #TODO session['user']['id']
+    
+    id = int(request.form.get('id', default=-1)) # non negative drink id
+    result = get_db().apiDeleteItem(id)
+    
+    # return new drinks list after delete
+    drinks = get_db().apiGetItems(n=20, offset=0) # TODO max number drinks?
+    return json.jsonify(drinks)
 
 @app.route('/api/approveOrder', methods=['POST'])
 def apiApproveOrder():
@@ -152,49 +157,6 @@ def apiCancelOrder():
     message = int(request.form.get('message', default='User Requested'))
     result = get_db().apiCancelOrder(accessID, userID, orderID, message)
     return json.jsonify(result)
-
-# @app.route('/createNewUser', methods=['GET', 'POST'])
-# def createNewUser():
-#     message = None
-#     if request.method == 'POST':
-#         email = request.form.get('email')
-#         username = request.form.get('username')
-#         typed_password = request.form.get('password')
-#         user_type = request.form.get('userType')
-#         if email and username and typed_password and user_type:
-#             encrypted_password = pbkdf2_sha256.hash(typed_password)
-#             get_db().create_user(email, username, encrypted_password, user_type)
-#             return redirect('/login')
-#         else:
-#             message = "All fields are required, please try again."
-#     return render_template('createNewUser.html', message=message)
-
-# @app.route('/login', methods=['GET', 'POST'])
-# def login():
-#     message = None
-#     if request.method == 'POST':
-#         username = request.form.get('username')
-#         typed_password = request.form.get('password')
-#         if username and typed_password:
-#             user = get_db().get_user(username)
-#             if user:
-#                 if pbkdf2_sha256.verify(typed_password, user["EncryptPass"]):
-#                     session['user'] = user
-#                     return redirect('/')
-#                 else:
-#                     message = "Incorrect password, please try again"
-#             else:
-#                 message = "Unknown user, please try again"
-#         else:
-#             message = "Invalid login, please try again"
-#     return render_template('login.html', message=message)
-
-# @app.route('/logout', methods=['GET'])
-# def logout():
-#     #drop session cookie
-#     session['user'] = None
-#     #redirect to home
-#     return redirect('/')
 
 @app.route("/login")
 def login():
@@ -266,7 +228,6 @@ def manager():
         get_db().apiAddItem(accessID=1,itemType= itemType,itemName=name, itemPrice=price,
                                     itemImage=image, itemDescription=description)
     return render_template('manager.html', session=session.get('user'), pretty=json.dumps(session.get('user'), indent=4))
-
 
 
 @app.errorhandler(AuthError)
