@@ -1,15 +1,13 @@
 import json
-from flask import request, _request_ctx_stack, abort
 from functools import wraps
 from jose import jwt
 from urllib.request import urlopen
+from os import environ as env
+from dotenv import find_dotenv, load_dotenv
 
-
-AUTH0_DOMAIN = 'dev-u47j7bisvynaztjd.us.auth0.com'
-ALGORITHMS = ['RS256']
-API_AUDIENCE = 'coffee'
-AUTH0_CLIENT_ID = 'UYCUyUXE0ryIUN5ikMM0N0yi107p8cPb'
-APP_SECRET_KEY = '2b6a2a8ecf602d54cfa04724db687d7e9d5fb50f42ec9c7897ff3ae1631ca151'
+ENV_FILE = find_dotenv()
+if ENV_FILE:
+    load_dotenv(ENV_FILE)
 
 ## AuthError Exception
 '''
@@ -63,7 +61,7 @@ def check_permissions(permission, payload):
 
 def verify_decode_jwt(token):
     # Receives the public key from AUTH0
-    jsonurl = urlopen(f'https://{AUTH0_DOMAIN}/.well-known/jwks.json')
+    jsonurl = urlopen(f'https://{env.get("AUTH0_DOMAIN")}/.well-known/jwks.json')
     jwks = json.loads(jsonurl.read())
 
     # get the data in header
@@ -92,9 +90,9 @@ def verify_decode_jwt(token):
         try:
             payload = jwt.decode(token,
                                  rsa_key,
-                                 algorithms=ALGORITHMS,
-                                 audience=API_AUDIENCE,
-                                 issuer='https://' + AUTH0_DOMAIN + '/')
+                                 algorithms=env.get("ALGORITHMS"),
+                                 audience=env.get("API_AUDIENCE"),
+                                 issuer='https://' + env.get("AUTH0_DOMAIN") + '/')
 
             return payload
 

@@ -218,7 +218,8 @@ def testPage(jwt):
     return render_template('barista.html', session=session.get('user'), pretty=json.dumps(session.get('user'), indent=4))
 
 @app.route('/manager', methods=['GET', 'POST'])
-def manager():
+@requires_auth('post:deletedrinks')
+def manager(jwt):
     if request.method == 'POST':
         name = request.form.get('name')
         price = request.form.get('price')
@@ -232,11 +233,13 @@ def manager():
 
 @app.errorhandler(AuthError)
 def handle_auth_error(ex):
-    return jsonify({
-        "success": False,
-        "error": ex.status_code,
-        'message': ex.error
-    }), 401
+    # return jsonify({
+    #     "success": False,
+    #     "error": ex.status_code,
+    #     'message': ex.error
+    # }), 401
+    return render_template('errors/401.html'), 401
+    
 
 if __name__ == '__main__':
     app.run(host='127.0.0.1', port=8080, debug=True)
