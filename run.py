@@ -153,49 +153,6 @@ def apiCancelOrder():
     result = get_db().apiCancelOrder(accessID, userID, orderID, message)
     return json.jsonify(result)
 
-# @app.route('/createNewUser', methods=['GET', 'POST'])
-# def createNewUser():
-#     message = None
-#     if request.method == 'POST':
-#         email = request.form.get('email')
-#         username = request.form.get('username')
-#         typed_password = request.form.get('password')
-#         user_type = request.form.get('userType')
-#         if email and username and typed_password and user_type:
-#             encrypted_password = pbkdf2_sha256.hash(typed_password)
-#             get_db().create_user(email, username, encrypted_password, user_type)
-#             return redirect('/login')
-#         else:
-#             message = "All fields are required, please try again."
-#     return render_template('createNewUser.html', message=message)
-
-# @app.route('/login', methods=['GET', 'POST'])
-# def login():
-#     message = None
-#     if request.method == 'POST':
-#         username = request.form.get('username')
-#         typed_password = request.form.get('password')
-#         if username and typed_password:
-#             user = get_db().get_user(username)
-#             if user:
-#                 if pbkdf2_sha256.verify(typed_password, user["EncryptPass"]):
-#                     session['user'] = user
-#                     return redirect('/')
-#                 else:
-#                     message = "Incorrect password, please try again"
-#             else:
-#                 message = "Unknown user, please try again"
-#         else:
-#             message = "Invalid login, please try again"
-#     return render_template('login.html', message=message)
-
-# @app.route('/logout', methods=['GET'])
-# def logout():
-#     #drop session cookie
-#     session['user'] = None
-#     #redirect to home
-#     return redirect('/')
-
 @app.route("/login")
 def login():
     return oauth.auth0.authorize_redirect(
@@ -256,7 +213,8 @@ def testPage(jwt):
     return render_template('barista.html', session=session.get('user'), pretty=json.dumps(session.get('user'), indent=4))
 
 @app.route('/manager', methods=['GET', 'POST'])
-def manager():
+@requires_auth('post:deletedrinks')
+def manager(jwt):
     if request.method == 'POST':
         name = request.form.get('name')
         price = request.form.get('price')
@@ -271,11 +229,13 @@ def manager():
 
 @app.errorhandler(AuthError)
 def handle_auth_error(ex):
-    return jsonify({
-        "success": False,
-        "error": ex.status_code,
-        'message': ex.error
-    }), 401
+    # return jsonify({
+    #     "success": False,
+    #     "error": ex.status_code,
+    #     'message': ex.error
+    # }), 401
+    return render_template('errors/401.html'), 401
+    
 
 if __name__ == '__main__':
     app.run(host='127.0.0.1', port=8080, debug=True)
