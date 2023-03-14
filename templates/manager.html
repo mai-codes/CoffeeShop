@@ -1,0 +1,102 @@
+{% extends 'base.html' %}
+{% set active = "manager" %}
+
+{% block header %}
+<script src="/static/js/managerView.js"></script>
+{% endblock %}
+
+{% block title %}
+Order
+{% endblock %}
+
+{% block content %}
+
+<div class="w3-container">
+    <div class="w3-padding-32 w3-center">
+        <h1>Manage Menu</h1>
+        <br>
+        {% if session %}
+        <h1>Hi {{ session.userinfo.name }}, edit menu items below:</h1>
+        <br>
+        {% else %}
+        <!-- Show link to login button -->
+        <h2>To edit items please <a href="/login" >Login</a>.</h2>
+        {% endif %}
+    </div>
+</div>
+
+
+<!--Edit current items-->
+<div class="w3-container">
+
+    <div id="drinktable" class="container">
+        <script>
+
+            $(() => {
+                const managerView = new ManagerView(10);
+                managerView.load();
+            });
+        
+        </script>
+    </div>
+
+</div>
+
+
+<!--Add new item form-->
+<div class="w3-container drinkCards">
+    <div class="card-column">
+        <div class="w3-card-2">
+            <header class="w3-container w3-sand">
+                <h3>Add a new drink: </h3>
+            </header>
+
+            <div class="w3-container">
+                <form method="POST" action="/manager" class="pt-3">
+                    <div class="form-group row">
+                        <label for="example-text-input" class="col-2 col-form-label">Drink Name: </label>
+                        <div class="col-4">
+                            <input class="form-control" type="text" name="name">
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <label for="example-text-input" class="col-2 col-form-label">Drink Price:</label>
+                        <div class="col-4">
+                            <input class="form-control" type="text" name="price">
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <label for="example-text-input" class="col-2 col-form-label">Drink Image Name:</label>
+                        <div class="col-4">
+                            <input class="form-control" type="text" name="image">
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <label for="userType" class="col-2 col-form-label">Drink Type:</label>
+                        <div class="col-4">
+                            <select id="type" name="type">
+                            <option value=0>Coffee</option>
+                            <option value=1>Tea</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group row">
+                        <label for="example-text-input" class="col-2 col-form-label">Drink description:</label>
+                        <div class="col-4">
+                            <input class="form-control" type="text" name="desciption">
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-2"></div>
+                        <br>
+                        <div class="col-4">
+                            <button type="submit" class="w3-button w3-light-grey">Submit</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

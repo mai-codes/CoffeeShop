@@ -1,9 +1,7 @@
-import os
-
 from datetime import datetime
 from flask import Flask, g, json, jsonify, render_template, request, redirect, session, url_for
 from flask_cors import cross_origin
-from passlib.hash import pbkdf2_sha256
+
 from db import Database
 from auth import AuthError, requires_auth
 from dotenv import find_dotenv, load_dotenv
@@ -16,7 +14,6 @@ if ENV_FILE:
     load_dotenv(ENV_FILE)
 
 app = Flask(__name__)
-# app.secret_key = b'topsecretkeydontshare!'
 app.secret_key = env.get("APP_SECRET_KEY")
 
 oauth = OAuth(app)
@@ -257,6 +254,19 @@ def cart():
 @requires_auth('post:drinks')
 def testPage(jwt):
     return render_template('barista.html', session=session.get('user'), pretty=json.dumps(session.get('user'), indent=4))
+
+@app.route('/manager', methods=['GET', 'POST'])
+def manager():
+    if request.method == 'POST':
+        name = request.form.get('name')
+        price = request.form.get('price')
+        image = request.form.get('image')
+        itemType = request.form.get('type')
+        description = request.form.get('description')
+        get_db().apiAddItem(accessID=1,itemType= itemType,itemName=name, itemPrice=price,
+                                    itemImage=image, itemDescription=description)
+    return render_template('manager.html', session=session.get('user'), pretty=json.dumps(session.get('user'), indent=4))
+
 
 
 @app.errorhandler(AuthError)
