@@ -1,5 +1,29 @@
-{% block content %}
-  <h1>Sorry ...</h1>
-  <p>You are not permitted to view this page!</p>
-  <p><a href="{{url_for('home')}}">Back</a></p>
-{% endblock %}
+<!DOCTYPE html>
+
+<html>
+
+<head>
+    <title>CoffeeShop - {% block title %}{% endblock %}</title>
+
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Karma">
+    <link rel="stylesheet" href="/static/css/base.css">
+
+    <script src="/static/lib/jquery/jquery.min.js"></script>
+    <script src="/static/lib/popper/popper.min.js"></script>
+    {% block header %}{% endblock %}
+</head>
+
+<main>
+  <div class="w3-main w3-content w3-padding" style="max-width:1200px;margin-top:100px">
+      {% block content %}
+      <img align="right" src="static/img/errorcoffee.webp" >
+      <h1>Sorry ...</h1>
+      <p>You are not authorized to access this resource!</p>
+      <p><a href="{{url_for('home')}}">Back</a></p>
+      {% endblock %}
+  </div>
+</main>
+
