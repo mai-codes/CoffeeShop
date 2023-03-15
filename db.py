@@ -1,5 +1,5 @@
 import sqlite3
-import datetime
+from datetime import datetime
 
 PATH = 'DBFiles/coffeeShop.db'
 
@@ -197,7 +197,7 @@ class Database:
             #add all from cart
             self.execute('INSERT INTO OrderItem (OrderID, ItemID, Size, Price, Count) '\
                          "SELECT ?, ci.ItemID, ci.Size, IIF(ci.Size='Large', Item.LGPrice, IIF(ci.Size='Medium', Item.MDPrice, Item.SMPrice) ), ci.Count FROM CartItem as ci WHERE ci.UserID=?", [data[0][0], userID])
-            
+
             #remove from the cart
             self.execute('DELETE FROM CartItem WHERE UserID=?', [userID])
 

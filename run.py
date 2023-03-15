@@ -107,7 +107,6 @@ def apiAddToCart():
 def apiRemoveFromCart():
     userID = -1
     if(session.get('user').get('userinfo').get('sid') != None):
-        # print(session.get('user').get('sid'))
         userID = int(session.get('user').get('userinfo').get('sid') != None) #can get from the session variable.
 
     cartItemID = int(request.form.get('cartItemID', default=-1)) #negative id should not exist
@@ -118,9 +117,9 @@ def apiRemoveFromCart():
 @app.route('/api/createOrder', methods=['POST'])
 def apiCreateOrder():
     userID = -1
-    if(session['user'] != None):
-        userID = int(session['user']['id']) #can get from the session variable.
-
+    if(session.get('user').get('userinfo').get('sid') != None):
+        userID = int(session.get('user').get('userinfo').get('sid') != None) #can get from the session variable.
+        
     result = get_db().apiCreateOrder(userID)
     return json.jsonify(result)
 
@@ -223,7 +222,6 @@ def cart():
 @app.route('/barista')
 @requires_auth('post:drinks')
 def testPage(jwt):
-    print(session)
     return render_template('barista.html', session=session.get('user'), pretty=json.dumps(session.get('user'), indent=4), permission = jwt.get('permissions'))
 
 @app.route('/manager', methods=['GET', 'POST'])
