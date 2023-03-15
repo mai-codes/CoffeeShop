@@ -96,9 +96,10 @@ def apiAddToCart():
         userID = int(session['user']['id']) #can get from the session variable.
 
     itemID = int(request.form.get('itemID', default=-1)) #negative id should not exist
+    size = request.form.get('size', default="Small")
     count = int(request.form.get('count', default=0))
 
-    result = get_db().apiAddToCart(userID, itemID, count)
+    result = get_db().apiAddToCart(userID, itemID, size, count)
     return json.jsonify(result)
 
 @app.route('/api/createOrder', methods=['POST'])
@@ -115,13 +116,16 @@ def apiAddItem():
     accessID = -1
     if(session['user'] != None):
         accessID = int(session['user']['id']) #can get from the session variable.
+        
     itemType = int(request.form.get('itemType', default=0)) #0 == coffee, 1 == tea. Just for sorting purposes
     name = int(request.form.get('name', default='N/A'))
-    price = int(request.form.get('price', default=0.00))
+    smprice = int(request.form.get('smallprice', default=0.00))
+    mdprice = int(request.form.get('mediumprice', default=0.00))
+    lgprice = int(request.form.get('largeprice', default=0.00))
     image = int(request.form.get('image', default=''))
     desc = int(request.form.get('description', default=''))
     
-    result = get_db().apiAddItem(accessID, itemType, name, price, image, desc)
+    result = get_db().apiAddItem(accessID, itemType, name, smprice, mdprice, lgprice, image, desc)
     print("RESULT: ", result)
     return json.jsonify(result)
 

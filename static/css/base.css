@@ -19,7 +19,7 @@ body,h1,h2,h3,h4,h5,h6 {
 
 .drinkImage {
     /* max-width: 80%; */
-    float: left;
+    /* float: left; */ /* Less empty space without. Likely due to the changes I made with the buttons. */
     width:  300px;
     height: 150px;
     object-fit: contain;
@@ -39,6 +39,14 @@ body,h1,h2,h3,h4,h5,h6 {
     text-align: center;
 }
 
+.drinkCards::before {
+    display: none;
+}
+
+.drinkCards::after {
+    display: none;
+}
+
 .card-column {
     border: solid 3px #6B4F4F;
     transition: border-width 0.2s linear;
@@ -49,4 +57,12 @@ body,h1,h2,h3,h4,h5,h6 {
 
 a:hover{
     color: lightgrey;
+}
+
+.invisible {
+	display: none;
+}
+
+.drink-radio-btn input[type="radio"]:checked + label {
+    background: lightgray;
 }

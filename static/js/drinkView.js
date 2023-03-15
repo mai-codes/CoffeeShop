@@ -23,18 +23,52 @@ function DrinkView(numDrinks) {
                     </header>
                     <div class="w3-container">
                         <img class="w3-image drinkImage" src="/static/img/${drink.image}">
-                        <button class="w3-btn">S</button>
-                        <button class="w3-btn">M</button>
-                        <button class="w3-btn">L</button>
+                        <div class="w3-container w3-cell-row">
+                            <div class="drink-radio-btn w3-cell">
+                                <input class="invisible" type="radio" id="drinkItemSmall_${i}" name="drinkItem_${i}" value="Small" checked>
+                                <label class="w3-button" for="drinkItemSmall_${i}">S</label>
+                            </div>
+                            <div class="drink-radio-btn w3-cell">
+                                <input class="invisible" type="radio" id="drinkItemMedium_${i}" name="drinkItem_${i}" value="Medium">
+                                <label class="w3-button" for="drinkItemMedium_${i}">M</label>
+                            </div>
+                            <div class="drink-radio-btn w3-cell">
+                                <input class="invisible" type="radio" id="drinkItemLarge_${i}" name="drinkItem_${i}" value="Large">
+                                <label class="w3-button" for="drinkItemLarge_${i}">L</label>
+                            </div>
+                        </div>
                     </div>
                 
                     <footer class="w3-container w3-sand">
-                        <h5>${drink.price}</h5>
-                        <button class="w3-btn">Add to Cart </button>
+                        <h5>$ ${drink.smallprice}</h5>
+                        <button class="w3-button">Add to Cart</button>
                     </footer>
                 </div>
             </div>
             `);
+
+            $(drinkRow).find(`#drinkItemSmall_${i}`).on('click', function(e) {
+                $(drinkRow).find('h5').text(`$ ${drink.smallprice}`)
+            });
+            $(drinkRow).find(`#drinkItemMedium_${i}`).on('click', function(e) {
+                $(drinkRow).find('h5').text(`$ ${drink.mediumprice}`)
+            });
+            $(drinkRow).find(`#drinkItemLarge_${i}`).on('click', function(e) {
+                $(drinkRow).find('h5').text(`$ ${drink.largeprice}`)
+            });
+            $(drinkRow).find('button').on('click', function(e) {
+                console.log("click");
+                var sizeName = $(drinkRow).find(`input[name="drinkItem_${i}"]:checked`).val();
+                
+                $.post('/api/addToCart', {
+                    itemID: drink.id,
+                    size: sizeName,
+                    count: 1
+                }, (data) => {
+                    //probably should do something. Just print the json or something
+                    console.log(data);
+                });
+            });
 
             $(drinkRow).find('.dec-button').on('click', _ => {
                 this.decrement(drink);

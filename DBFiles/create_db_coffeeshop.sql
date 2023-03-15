@@ -1,6 +1,6 @@
 
 -- This is assuming that we store the password and username here. We require the Email though for order confirmation.
-CREATE TABLE User (
+CREATE TABLE IF NOT EXISTS User  (
 	ID INTEGER PRIMARY KEY,
 	Type TEXT NOT NULL, -- Should be Customer, Barista, Manager, etc.
 	Email TEXT NOT NULL, -- Can be used for resetting password and sending order confirmations
@@ -10,7 +10,7 @@ CREATE TABLE User (
 
 -- All orders should be visible by an admin of some sorts.
 -- Use Transactions (sql thing) to allow pending orders.
-CREATE TABLE OrderInfo (
+CREATE TABLE IF NOT EXISTS OrderInfo (
 	ID INTEGER PRIMARY KEY,
 	UserID INTEGER NOT NULL,
 	Status TEXT NOT NULL,		--Status (Accepted, Processing, Canceled, etc.)
@@ -19,30 +19,37 @@ CREATE TABLE OrderInfo (
 );
 
 -- Some item that can be ordered.
--- Forgot about size. That can be fixed by adding them as different items all together.
--- This makes the cart easier too and allows for different images for each item. Also, I'm a little lazy.
-CREATE TABLE Item (
+-- Note that here, all prices for each size are listed. When submitting the item to the cart, it will have the size but not the price of the size.
+-- This is due to possible price changes for a given size.
+CREATE TABLE IF NOT EXISTS Item (
 	ID INTEGER PRIMARY KEY,
 	Type INTEGER NOT NULL, -- Should be coffee or tea so that it is possible to browse just one type of drink.
-	Price SMALLMONEY NOT NULL,
+	SMPrice SMALLMONEY NOT NULL,
+	MDPrice SMALLMONEY NOT NULL,
+	LGPrice SMALLMONEY NOT NULL,
 	Name TEXT,
 	Image TEXT,
 	Description TEXT
 );
 
 -- Done to have clean list not stored in a csv style. Items are tied to the appropriate order
-CREATE TABLE OrderItem (
+-- OrderItem will have a separate price since order history should contain what you originally paid for the item.
+CREATE TABLE IF NOT EXISTS OrderItem (
 	ID INTEGER PRIMARY KEY,
 	OrderID INTEGER NOT NULL,
 	ItemID INTEGER NOT NULL,
+	Size TEXT NOT NULL,
+	Price SMALLMONEY NOT NULL,
 	Count INTEGER
 );
 
 -- Items tied to a users cart. This should be done through cookies as well but
 -- This is needed so carts are synced through devices and browsers.
-CREATE TABLE CartItem (
+-- Note that the price of an item can change based on size and date. (Price in order history should be what you paid and not the current price)
+CREATE TABLE IF NOT EXISTS CartItem (
 	ID INTEGER PRIMARY KEY,
 	UserID INTEGER NOT NULL,
 	ItemID INTEGER NOT NULL,
+	Size TEXT NOT NULL,
 	Count INTEGER
 );
