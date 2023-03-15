@@ -6,6 +6,7 @@ document.onload = function() {
 function checkout() {
     //add an alert or something to avoid cases where the user misclicks and ensures that the user knows that they actually ordered something.
     $.post('/api/createOrder', {}, (data) => {
+        console.log(data);
         reloadCart();
     });
 }

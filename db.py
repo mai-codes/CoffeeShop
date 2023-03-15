@@ -104,8 +104,8 @@ class Database:
             }
     
     #get all orders from user
-    def apiGetOrders(self, accessID, userID):
-        if(self.getPermissions(accessID) >= 1 or accessID==userID and accessID != -1 and userID != -1):
+    def apiGetOrders(self, userID):
+        if(userID != -1):
             #Adjusted to get order item price which may not be the same as the current items price and its size.
             data = self.select('SELECT OrderInfo.ID, OrderInfo.Date, OrderItem.Count, Item.Name, OrderItem.Size, OrderItem.Price, Item.Image, OrderInfo.Status '\
                                 'FROM OrderInfo '\
@@ -130,28 +130,22 @@ class Database:
                 'Reason': 'Invalid Permissions'
             }
     
-    def apiGetAllOrders(self, accessID):
-        if(self.getPermissions(accessID) >= 1 and accessID != -1):
-            data = self.select('SELECT OrderInfo.ID, OrderInfo.Date, OrderItem.Count, Item.Name, OrderItem.Size, OrderItem.Price, Item.Image, OrderInfo.Status'\
-                                'FROM OrderInfo '\
-                                'INNER JOIN OrderItem ON OrderInfo.ID=OrderItem.OrderID '\
-                                'INNER JOIN Item ON Item.ID=OrderItem.ItemID ORDER BY OrderInfo.Date DESC')
+    def apiGetAllOrders(self):
+        data = self.select('SELECT OrderInfo.ID, OrderInfo.Date, OrderItem.Count, Item.Name, OrderItem.Size, OrderItem.Price, Item.Image, OrderInfo.Status'\
+                            'FROM OrderInfo '\
+                            'INNER JOIN OrderItem ON OrderInfo.ID=OrderItem.OrderID '\
+                            'INNER JOIN Item ON Item.ID=OrderItem.ItemID ORDER BY OrderInfo.Date DESC')
 
-            return [{
-                'orderID': d[0],
-                'orderDate': d[1],
-                'itemCount': d[2],
-                'itemName': d[3],
-                'itemSize': d[4],
-                'itemPrice': d[5],
-                'itemImage': d[6],
-                'orderStatus': d[7]
-            } for d in data]
-        else:
-            return {
-                'Status': 'Failed',
-                'Reason': 'Invalid Permissions'
-            }
+        return [{
+            'orderID': d[0],
+            'orderDate': d[1],
+            'itemCount': d[2],
+            'itemName': d[3],
+            'itemSize': d[4],
+            'itemPrice': d[5],
+            'itemImage': d[6],
+            'orderStatus': d[7]
+        } for d in data]
     
     def apiAddToCart(self, userID, itemID, size, count):
         if(userID != -1):
@@ -186,6 +180,14 @@ class Database:
     def apiCreateOrder(self, userID):
         if(userID != -1):
 
+            # Only add if there are items in the cart
+            data = self.select('SELECT * FROM CartItem Where CartItem.UserID=?', [userID])
+            if(len(data) == 0):
+                return {
+                    'Status': 'Failed',
+                    'Reason': 'No Items in cart'
+                }
+            
             dateFormat = '%Y-%m-%d %I:%M %p'
             dateString = datetime.now().strftime(dateFormat)
             data = self.execute("INSERT INTO OrderInfo (UserID, Date, Status) VALUES (?, ?, 'Pending')", [userID, dateString])
@@ -196,7 +198,9 @@ class Database:
 
             #add all from cart
             self.execute('INSERT INTO OrderItem (OrderID, ItemID, Size, Price, Count) '\
-                         "SELECT ?, ci.ItemID, ci.Size, IIF(ci.Size='Large', Item.LGPrice, IIF(ci.Size='Medium', Item.MDPrice, Item.SMPrice) ), ci.Count FROM CartItem as ci WHERE ci.UserID=?", [data[0][0], userID])
+                         "SELECT ?, ci.ItemID, ci.Size, IIF(ci.Size='Large', Item.LGPrice, IIF(ci.Size='Medium', Item.MDPrice, Item.SMPrice) ), ci.Count FROM CartItem as ci "\
+                         "INNER JOIN Item ON ci.ItemID=Item.ID "\
+                         "WHERE ci.UserID=?", [data[0][0], userID])
 
             #remove from the cart
             self.execute('DELETE FROM CartItem WHERE UserID=?', [userID])

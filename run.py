@@ -62,19 +62,20 @@ def apiGetCart():
 
 @app.route('/api/getOrders', methods=['GET'])
 def apiGetOrders():
-    accessID = -1
-    if(session['user'] != None):
-        accessID = int(session['user']['id']) #can get from the session variable.
-    userID = int(request.args.get('userID', default=-1)) #negative id should not exist
-    ordersInfo = get_db().apiGetOrders(accessID, userID)
+    userID = -1
+    if(session.get('user').get('userinfo').get('sid') != None):
+        userID = int(session.get('user').get('userinfo').get('sid') != None)
+    ordersInfo = get_db().apiGetOrders(userID)
     return json.jsonify(ordersInfo)
 
+# User ID no longer needed here other than to check for permissions.
 @app.route('/api/getAllOrders', methods=['GET'])
 def apiGetAllOrders():
     userID = -1
     if(session.get('user').get('userinfo').get('sid') != None):
         userID = int(session.get('user').get('userinfo').get('sid') != None)
-    ordersInfo = get_db().apiGetAllOrders(userID)
+    
+    ordersInfo = get_db().apiGetAllOrders()
     return json.jsonify(ordersInfo)
 
 @app.route('/api/getPendingOrders', methods=['GET'])

@@ -22,26 +22,36 @@ function orderHistoryView() {
 
         var orderDiv = null;
         var knownOrderID = null;
+        var knownTotal = 0;
+
         for (let i = 0; i < items.length; i++) {
             const item = items[i];
+            console.log(item);
             if(knownOrderID == null)
             {
                 //create new orderDiv
-                orderDiv = $('<div class="w3-container"></div>');
+                orderDiv = $('<div class="w3-container w3-left-align"></div>');
                 orderDiv.append( $(`<h3>OrderID: ${item.orderID}</h3>`) );
                 orderDiv.append( $(`<h3>Date: ${item.orderDate}</h3>`) );
                 orderDiv.append( $(`<h3>OrderStatus: ${item.orderStatus}</h3>`) );
+                orderDiv.append( $(`<h3 id='price_${item.orderID}'>Total: </h3>`));
             }
             else if(item.orderID != knownOrderID)
             {
                 //add previous orderDiv to table
+                $(orderDiv).find(`#price_${knownOrderID}`).text(`Total: $${knownTotal}`);
                 $(table).append(orderDiv);
+                knownTotal = 0;
                 //create new orderDiv
-                orderDiv = $('<div class="w3-container"></div>');
+                orderDiv = $('<br><br><div class="w3-container w3-left-align"></div>');
                 orderDiv.append( $(`<h3>OrderID: ${item.orderID}</h3>`) );
                 orderDiv.append( $(`<h3>Date: ${item.orderDate}</h3>`) );
                 orderDiv.append( $(`<h3>OrderStatus: ${item.orderStatus}</h3>`) );
+                orderDiv.append( $(`<h3 id='price_${item.orderID}'>Total: </h3>`));
             }
+
+            knownOrderID = item.orderID;
+            knownTotal += item.itemPrice;
 
             const itemRow = $(`
             <li class="w3-row">
@@ -52,7 +62,6 @@ function orderHistoryView() {
                     <h3>${item.itemName}</h3>
                 </div>
                 <div class="w3-third w3-container">
-                <button class="w3-btn w3-red w3-round w3-right">&times;</button>
                     <p>Amount: ${item.itemCount}</p>
                     <p>Size: ${item.itemSize}</p>
                     <p>Price: $ ${item.itemPrice}</p>
@@ -64,13 +73,15 @@ function orderHistoryView() {
         }
         
         //add last order to table
+        $(orderDiv).find(`#price_${knownOrderID}`).text(`Total: $${knownTotal}`);
         $(table).append(orderDiv);
+        knownTotal = 0;
 
         $('#pastOrdersList').append(table);
     }
 
     this.load = () => {
-        $.get('/api/getAllOrders', {}, (data) => {
+        $.get('/api/getOrders', {}, (data) => {
             this.update(data);
         });
     };
