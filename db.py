@@ -308,10 +308,7 @@ class Database:
             }
         else:
             return None
-    
-    def create_user(self, email, username, EncryptPass, userType):
-        self.execute('INSERT INTO user (Type, Email, Username, EncryptPass) VALUES (?, ?, ?, ?)',
-                     [userType, email, username, EncryptPass])
+
     
     def close(self):
         self.conn.close()

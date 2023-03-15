@@ -1,3 +1,7 @@
+function refreshPage(){
+    window.location.reload();
+} 
+
 function DrinkView(numDrinks) {
     this.update = (data) => {
         if (!Array.isArray(data)) {
@@ -6,6 +10,15 @@ function DrinkView(numDrinks) {
         }
 
         this.updateDrinks(data);
+    }
+
+    this.updateCart = (data) => {
+        let totalCount = 0;
+        for (let itemCount in data){
+            totalCount = totalCount + 1;
+        }
+        console.log(totalCount);
+        $('#cart').text(`View Cart (${totalCount})`);
     }
 
     this.updateDrinks = (drinks) => {
@@ -56,6 +69,7 @@ function DrinkView(numDrinks) {
             $(drinkRow).find(`#drinkItemLarge_${i}`).on('click', function(e) {
                 $(drinkRow).find('h5').text(`$ ${drink.largeprice}`)
             });
+
             $(drinkRow).find('button').on('click', function(e) {
                 console.log("click");
                 var sizeName = $(drinkRow).find(`input[name="drinkItem_${i}"]:checked`).val();
@@ -67,7 +81,13 @@ function DrinkView(numDrinks) {
                 }, (data) => {
                     //probably should do something. Just print the json or something
                     console.log(data);
+                    refreshPage()
                 });
+            });
+
+
+            $(drinkRow).find('.dec-button').on('click', _ => {
+                this.decrement(drink);
             });
 
             $(drinkRow).find('.dec-button').on('click', _ => {
@@ -88,6 +108,15 @@ function DrinkView(numDrinks) {
     this.load = () => {
         $.get('/api/getItems', {}, (data) => {
             this.update(data);
+        });
+        $.get('/api/getCart', {
+        }, (data) => {
+            // let totalCount = 0;
+            // for (let itemCount in data){
+            //     totalCount = totalCount + 1;
+            // }
+            // console.log(totalCount);
+            this.updateCart(data);
         });
     };
 }

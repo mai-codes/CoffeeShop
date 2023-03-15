@@ -14,7 +14,7 @@ Order
     <div class="w3-padding-32 w3-center">
         {% if session %}
         <h1>Hi {{ session.userinfo.name }}, place your order below:</h1>
-        <a href="/cart" class="w3-button w3-light-grey">View Cart</a>
+        <a href="/cart" class="w3-button w3-light-grey" id="cart">View Cart</a>
         <br>
         {% else %}
         <!-- Show link to login button -->
