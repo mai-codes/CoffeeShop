@@ -52,6 +52,7 @@ function ManagerView(numDrinks) {
             id: drink.id
         }, (data) => {
             this.update(data);
+            this.load();
         });
     }
 

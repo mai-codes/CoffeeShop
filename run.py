@@ -116,7 +116,7 @@ def apiAddItem():
     accessID = -1
     if(session['user'] != None):
         accessID = int(session['user']['id']) #can get from the session variable.
-        
+
     itemType = int(request.form.get('itemType', default=0)) #0 == coffee, 1 == tea. Just for sorting purposes
     name = int(request.form.get('name', default='N/A'))
     smprice = int(request.form.get('smallprice', default=0.00))
@@ -126,21 +126,13 @@ def apiAddItem():
     desc = int(request.form.get('description', default=''))
     
     result = get_db().apiAddItem(accessID, itemType, name, smprice, mdprice, lgprice, image, desc)
-    print("RESULT: ", result)
     return json.jsonify(result)
 
-@app.route('/api/deleteItem', methods=['POST'])
+@app.route('/api/deleteItem', methods=['POST']) #changed to post since delete is not suppose to have a body and jquery does not have $.delete()
 def apiDeleteItem():
-    accessID = -1
-    if(session['user'] != None):
-        accessID = int(1) #TODO session['user']['id']
-    
-    id = int(request.form.get('id', default=-1)) # non negative drink id
+    id = int(request.form.get('id', default=-1)) #negative id should not exist
     result = get_db().apiDeleteItem(id)
-    
-    # return new drinks list after delete
-    drinks = get_db().apiGetItems(n=20, offset=0) # TODO max number drinks?
-    return json.jsonify(drinks)
+    return json.jsonify(result)
 
 @app.route('/api/approveOrder', methods=['POST'])
 def apiApproveOrder():
@@ -176,7 +168,6 @@ def callback():
     text_file = open("token.txt", "w")
     text_file.write(access)
     text_file.close()
-    # print(access)
     session["user"] = token
     return redirect("/")
 
@@ -219,29 +210,26 @@ def cart():
 @app.route('/barista')
 @requires_auth('post:drinks')
 def testPage(jwt):
-    return render_template('barista.html', session=session.get('user'), pretty=json.dumps(session.get('user'), indent=4))
+    print(session)
+    return render_template('barista.html', session=session.get('user'), pretty=json.dumps(session.get('user'), indent=4), permission = jwt.get('permissions'))
 
 @app.route('/manager', methods=['GET', 'POST'])
-@requires_auth('post:deletedrinks')
-def manager(jwt):
+# @requires_auth('post:deletedrinks')
+def manager():
     if request.method == 'POST':
         name = request.form.get('name')
         price = request.form.get('price')
         image = request.form.get('image')
         itemType = request.form.get('type')
         description = request.form.get('description')
-        get_db().apiAddItem(accessID=1,itemType= itemType,itemName=name, itemPrice=price,
+        get_db().apiAddItem(itemType= itemType,itemName=name, itemPrice=price,
                                     itemImage=image, itemDescription=description)
     return render_template('manager.html', session=session.get('user'), pretty=json.dumps(session.get('user'), indent=4))
 
 
+
 @app.errorhandler(AuthError)
 def handle_auth_error(ex):
-    # return jsonify({
-    #     "success": False,
-    #     "error": ex.status_code,
-    #     'message': ex.error
-    # }), 401
     return render_template('errors/401.html'), 401
     
 

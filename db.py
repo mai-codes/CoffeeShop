@@ -51,21 +51,32 @@ class Database:
             'description': d[7]
         } for d in data]
 
-    def apiAddItem(self, accessID, itemType, itemName, smallPrice, mediumPrice, largePrice, itemImage, itemDescription):
-        #Assuming permissions checked at prev layer, TODO add user id checks if needed
-        self.execute( 'INSERT INTO Item (Type, Name, SMPrice, MDPrice, LGPrice, Image, Description) VALUES (?, ?, ?, ?, ?, ?, ?)', 
-                              [itemType, itemName, smallPrice, mediumPrice, largePrice, itemImage, itemDescription])
-        return {
-            'Status': 'Successful'
-        }
-
-    def apiDeleteItem(self,  id):
-        #Assuming permissions checked at prev layer, TODO add user id checks if needed
-        self.execute('DELETE FROM Item WHERE id=?', [id])
-        return {
-            'Status': 'Successful'
-        }
+    def apiAddItem(self, itemType, itemName, smallPrice, mediumPrice, largePrice, itemImage, itemDescription):
+        try:
+            data = self.execute( 'INSERT INTO ITEM (Type, Name, SMPrice, MDPrice, LGPrice, Image, Description) VALUES (?, ?, ?, ?, ?, ?, ?)', [itemType, itemName, smallPrice, mediumPrice, largePrice, itemImage, itemDescription])
             
+            #Should check if it actually updated to give valid or useful information
+            return {
+                'Status': 'Successful'
+            }
+        except:
+            return {
+                'Status': 'Failed',
+                'Reason': 'Invalid Permissions'
+            }
+
+    def apiDeleteItem(self, itemID):
+        try:
+            data = self.execute( 'DELETE FROM Item WHERE id=?', [itemID])
+            #Should check if it actually updated to give valid or useful information
+            return {
+                'Status': 'Successful'
+            }
+        except:
+            return {
+                'Status': 'Failed',
+                'Reason': 'Invalid Permissions'
+            }
     
     #get items in the cart for user
     def apiGetCart(self, userID):
