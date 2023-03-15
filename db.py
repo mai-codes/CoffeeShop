@@ -16,7 +16,7 @@ class Database:
         c = self.conn.cursor()
         c.execute(sql, parameters)
         return c.fetchall()
-    
+
     def getPermissions(self, accessID):
         if(accessID >= 0):
             data = self.select( 'SELECT Type FROM User WHERE ID=?', [accessID])
@@ -49,29 +49,28 @@ class Database:
             'description': d[5]
         } for d in data]
 
-    def apiAddItem(self, itemType, itemName, itemPrice, itemImage, itemDescription):
-        try:
+    def apiAddItem(self, accessID, itemType, itemName, itemPrice, itemImage, itemDescription):
+        if(self.getPermissions(accessID) >= 1 and accessID != -1):
             data = self.execute( 'INSERT INTO ITEM (Type, Name, Price, Image, Description) VALUES (?, ?, ?, ?, ?)', [itemType, itemName, itemPrice, itemImage, itemDescription])
-            print(data)
+            
             #Should check if it actually updated to give valid or useful information
             return {
                 'Status': 'Successful'
             }
-        except:
+        else:
             return {
                 'Status': 'Failed',
                 'Reason': 'Invalid Permissions'
             }
 
-    def apiDeleteItem(self, itemID):
-        # if(self.getPermissions(accessID) >= 1 and accessID != -1):
-        try:
+    def apiDeleteItem(self, accessID, itemID):
+        if(self.getPermissions(accessID) >= 1 and accessID != -1):
             data = self.execute( 'DELETE FROM Item WHERE id=?', [itemID])
-        #Should check if it actually updated to give valid or useful information
+            #Should check if it actually updated to give valid or useful information
             return {
                 'Status': 'Successful'
             }
-        except:
+        else:
             return {
                 'Status': 'Failed',
                 'Reason': 'Invalid Permissions'
