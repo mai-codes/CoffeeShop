@@ -29,7 +29,7 @@ function ManagerView(numDrinks) {
                     </div>
                 
                     <footer class="w3-container w3-sand">
-                        <h5>${drink.price}</h5>
+                        <h5> ${drink.smallprice}</h5>
                         <button class="w3-btn delete-button w3-text-red">Delete<i class="w3-margin-left fa fa-trash"></i></button>
                     </footer>
                 </div>

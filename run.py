@@ -71,18 +71,18 @@ def apiGetOrders():
 
 @app.route('/api/getAllOrders', methods=['GET'])
 def apiGetAllOrders():
-    accessID = -1
-    if(session['user'] != None):
-        accessID = int(session['user']['id']) #can get from the session variable.
-    ordersInfo = get_db().apiGetAllOrders(accessID)
+    userID = -1
+    if(session.get('user').get('userinfo').get('sid') != None):
+        userID = int(session.get('user').get('userinfo').get('sid') != None)
+    ordersInfo = get_db().apiGetAllOrders(userID)
     return json.jsonify(ordersInfo)
 
 @app.route('/api/getPendingOrders', methods=['GET'])
 def apiGetPendingOrders():
-    accessID = -1
-    if(session['user'] != None):
-        accessID = int(session['user']['id']) #can get from the session variable.
-    ordersInfo = get_db().apiGetPendingOrders(accessID)
+    userID = -1
+    if(session.get('user').get('userinfo').get('sid') != None):
+        userID = int(session.get('user').get('userinfo').get('sid') != None)
+    ordersInfo = get_db().apiGetPendingOrders(userID)
     return json.jsonify(ordersInfo)
 
 
@@ -227,8 +227,8 @@ def testPage(jwt):
     return render_template('barista.html', session=session.get('user'), pretty=json.dumps(session.get('user'), indent=4), permission = jwt.get('permissions'))
 
 @app.route('/manager', methods=['GET', 'POST'])
-# @requires_auth('post:deletedrinks')
-def manager():
+@requires_auth('post:deletedrinks')
+def manager(jwt):
     if request.method == 'POST':
         name = request.form.get('name')
         price = request.form.get('price')

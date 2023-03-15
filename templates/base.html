@@ -29,8 +29,10 @@
             <a href="/cart" onclick="w3_close()" class="w3-bar-item w3-button">View Cart</a>
             <a href="/orderHistory" onclick="w3_close()" class="w3-bar-item w3-button">View Order History</a>
             <a href="/userInfo" onclick="w3_close()" class="w3-bar-item w3-button">User Information</a>
+            {% if session.userinfo.permission %}
             <a href="/barista" onclick="w3_close()" class="w3-bar-item w3-button">Barista Settings</a>
             <a href="/manager" onclick="w3_close()" class="w3-bar-item w3-button">Manage Menu</a>
+            {% endif %}
             {% if session %}
             <!-- show logout button -->
             <a href="/logout" onclick="w3_close()" class="w3-bar-item w3-button">Logout</a>
