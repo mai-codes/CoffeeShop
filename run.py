@@ -55,8 +55,10 @@ def apiGetItems():
 @app.route('/api/getCart', methods=['GET'])
 def apiGetCart():
     userID = -1
-    if(session['user'] != None):
-        userID = int(session['user']['id']) #can get from the session variable.
+    if(session.get('user').get('userinfo').get('sid') != None):
+        # print(session.get('user').get('sid'))
+        userID = int(session.get('user').get('userinfo').get('sid') != None) #can get from the session variable.
+
     cartItems = get_db().apiGetCart(userID)
     return json.jsonify(cartItems)
 
@@ -92,8 +94,9 @@ def apiGetPendingOrders():
 @app.route('/api/addToCart', methods=['POST'])
 def apiAddToCart():
     userID = -1
-    if(session['user'] != None):
-        userID = int(session['user']['id']) #can get from the session variable.
+    if(session.get('user').get('userinfo').get('sid') != None):
+        # print(session.get('user').get('sid'))
+        userID = int(session.get('user').get('userinfo').get('sid') != None) #can get from the session variable.
 
     itemID = int(request.form.get('itemID', default=-1)) #negative id should not exist
     size = request.form.get('size', default="Small")

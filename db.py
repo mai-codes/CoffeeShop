@@ -152,7 +152,7 @@ class Database:
                 'Reason': 'Invalid Permissions'
             }
     
-    def apiAddToCart(self, accessID, userID, itemID, size, count):
+    def apiAddToCart(self, userID, itemID, size, count):
         if(userID != -1):
             # Should check if it already exist. If so, update instead of insert
             data = self.execute('INSERT INTO CartItem (UserID, ItemID, Size, Count) VALUES (?, ?, ?, ?)', [userID, itemID, size, count])
