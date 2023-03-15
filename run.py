@@ -1,6 +1,5 @@
 from datetime import datetime
 from flask import Flask, g, json, jsonify, render_template, request, redirect, session, url_for
-from flask_cors import cross_origin
 
 from db import Database
 from auth import AuthError, requires_auth
@@ -55,10 +54,9 @@ def apiGetItems():
 @app.route('/api/getCart', methods=['GET'])
 def apiGetCart():
     userID = -1
-    if(session.get('user').get('userinfo').get('sid') != None):
-        # print(session.get('user').get('sid'))
-        userID = int(session.get('user').get('userinfo').get('sid') != None) #can get from the session variable.
 
+    if(session.get('user').get('userinfo').get('sid') != None):
+        userID = int(session.get('user').get('userinfo').get('sid') != None) #can get from the session variable.
     cartItems = get_db().apiGetCart(userID)
     return json.jsonify(cartItems)
 
