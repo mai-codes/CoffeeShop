@@ -122,16 +122,12 @@ def apiAddItem():
     desc = int(request.form.get('description', default=''))
     
     result = get_db().apiAddItem(accessID, itemType, name, price, image, desc)
-    print("RESULT: ", result)
     return json.jsonify(result)
 
-@app.route('/api/deleteItem', methods=['POST'])
+@app.route('/api/deleteItem', methods=['POST']) #changed to post since delete is not suppose to have a body and jquery does not have $.delete()
 def apiDeleteItem():
-    accessID = -1
-    if(session['user'] != None):
-        accessID = int(session['user']['id']) #can get from the session variable.
-    id = int(request.form.get('itemID', default=-1)) #negative id should not exist
-    result = get_db().apiDeleteItem(accessID, id)
+    id = int(request.form.get('id', default=-1)) #negative id should not exist
+    result = get_db().apiDeleteItem(id)
     return json.jsonify(result)
 
 @app.route('/api/approveOrder', methods=['POST'])
@@ -168,7 +164,6 @@ def callback():
     text_file = open("token.txt", "w")
     text_file.write(access)
     text_file.close()
-    # print(access)
     session["user"] = token
     return redirect("/")
 
@@ -226,6 +221,7 @@ def manager():
         get_db().apiAddItem(itemType= itemType,itemName=name, itemPrice=price,
                                     itemImage=image, itemDescription=description)
     return render_template('manager.html', session=session.get('user'), pretty=json.dumps(session.get('user'), indent=4))
+
 
 
 @app.errorhandler(AuthError)

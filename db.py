@@ -49,28 +49,28 @@ class Database:
             'description': d[5]
         } for d in data]
 
-    def apiAddItem(self, accessID, itemType, itemName, itemPrice, itemImage, itemDescription):
-        if(self.getPermissions(accessID) >= 1 and accessID != -1):
+    def apiAddItem(self, itemType, itemName, itemPrice, itemImage, itemDescription):
+        try:
             data = self.execute( 'INSERT INTO ITEM (Type, Name, Price, Image, Description) VALUES (?, ?, ?, ?, ?)', [itemType, itemName, itemPrice, itemImage, itemDescription])
             
             #Should check if it actually updated to give valid or useful information
             return {
                 'Status': 'Successful'
             }
-        else:
+        except:
             return {
                 'Status': 'Failed',
                 'Reason': 'Invalid Permissions'
             }
 
-    def apiDeleteItem(self, accessID, itemID):
-        if(self.getPermissions(accessID) >= 1 and accessID != -1):
+    def apiDeleteItem(self, itemID):
+        try:
             data = self.execute( 'DELETE FROM Item WHERE id=?', [itemID])
             #Should check if it actually updated to give valid or useful information
             return {
                 'Status': 'Successful'
             }
-        else:
+        except:
             return {
                 'Status': 'Failed',
                 'Reason': 'Invalid Permissions'
