@@ -15,12 +15,12 @@ Cart
     <div class="text-center">
         <h1 class="jumbotron-heading">View Cart Items</h1>
 		
-		<ul id="cartList" class="w3-ul w3-card">
+		<ul id="cartList">
 			<script>
 
 				$(() => {
-					const drinkView = new loadCart();
-					drinkView.load();
+					const cartView = new loadCart();
+					cartView.load();
 				});
 			
 			</script>

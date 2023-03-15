@@ -37,6 +37,11 @@ function ManagerView(numDrinks) {
 
             $(drinkRow).find('.delete-button').on('click', _ => {
                 this.delete(drink);
+                if (confirm('Are you sure you want to delete this drink?')) {
+                    console.log('Thing was deleted from the database.');
+                } else {
+                    console.log('Thing was not deleted from the database.');
+                }
             });
 
             $(table).append(drinkRow);
