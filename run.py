@@ -126,11 +126,8 @@ def apiAddItem():
 
 @app.route('/api/deleteItem', methods=['POST']) #changed to post since delete is not suppose to have a body and jquery does not have $.delete()
 def apiDeleteItem():
-    accessID = -1
-    if(session['user'] != None):
-        accessID = int(session['user']['id']) #can get from the session variable.
-    id = int(request.form.get('itemID', default=-1)) #negative id should not exist
-    result = get_db().apiDeleteItem(accessID, id)
+    id = int(request.form.get('id', default=-1)) #negative id should not exist
+    result = get_db().apiDeleteItem(id)
     return json.jsonify(result)
 
 @app.route('/api/approveOrder', methods=['POST'])
@@ -210,18 +207,19 @@ def cart():
 @app.route('/barista')
 @requires_auth('post:drinks')
 def testPage(jwt):
-    return render_template('barista.html', session=session.get('user'), pretty=json.dumps(session.get('user'), indent=4))
+    print(session)
+    return render_template('barista.html', session=session.get('user'), pretty=json.dumps(session.get('user'), indent=4), permission = jwt.get('permissions'))
 
 @app.route('/manager', methods=['GET', 'POST'])
-@requires_auth('post:deletedrinks')
-def manager(jwt):
+# @requires_auth('post:deletedrinks')
+def manager():
     if request.method == 'POST':
         name = request.form.get('name')
         price = request.form.get('price')
         image = request.form.get('image')
         itemType = request.form.get('type')
         description = request.form.get('description')
-        get_db().apiAddItem(accessID=1,itemType= itemType,itemName=name, itemPrice=price,
+        get_db().apiAddItem(itemType= itemType,itemName=name, itemPrice=price,
                                     itemImage=image, itemDescription=description)
     return render_template('manager.html', session=session.get('user'), pretty=json.dumps(session.get('user'), indent=4))
 
@@ -229,11 +227,6 @@ def manager(jwt):
 
 @app.errorhandler(AuthError)
 def handle_auth_error(ex):
-    # return jsonify({
-    #     "success": False,
-    #     "error": ex.status_code,
-    #     'message': ex.error
-    # }), 401
     return render_template('errors/401.html'), 401
     
 
