@@ -13,8 +13,13 @@ Cart
 
 <section class="jumbotron">
     <div class="text-center">
-        <h1 class="jumbotron-heading">View Cart Items</h1>
-		
+		<div class="w3-container">
+			<h1 class="w3-threequarter jumbotron-heading">View Cart Items</h1>
+			<div class="w3-container w3-quarter">
+				<h3 id="cart-total-id">Total: $0.00</h3>
+				<button class="w3-btn w3-round-large w3-khaki w3-xlarge" onclick="checkout()">Checkout</button>
+			</div>
+		</div>
 		<ul id="cartList" class="w3-ul w3-card">
 			<script>
 
@@ -25,7 +30,7 @@ Cart
 			
 			</script>
 		</ul>
-        <!-- <p class="lead text-muted">View past orders here!</p> -->
+        
     </div>
 </section>
 

@@ -3,6 +3,18 @@ document.onload = function() {
     cartLoader.load();
 };
 
+function checkout() {
+    //add an alert or something to avoid cases where the user misclicks and ensures that the user knows that they actually ordered something.
+    $.post('/api/createOrder', {}, (data) => {
+        reloadCart();
+    });
+}
+
+function reloadCart() {
+    cartLoader = new loadCart();
+    cartLoader.load();
+}
+
 function loadCart() {
     this.update = (data) => {
         if (!Array.isArray(data)) {
@@ -15,28 +27,44 @@ function loadCart() {
 
     this.updateCart = (items) => {
         $('#cartList').empty();
+        var totalPrice = 0.00;
         
         for (let i = 0; i < items.length; i++) {
             const item = items[i];
+            console.log(item);
 
             const itemRow = $(`
             <li class="w3-row">
                 <div class="w3-third w3-container">
-                    <img class="w3-image drinkImage" src="/static/img/${drink.image}"/>
+                    <img class="w3-image drinkImage" src="./static/img/${item.itemImage}"/>
                 </div>
                 <div class="w3-third w3-container">
-                    <h3>${drink.name}</h3>
+                    <h3>${item.itemName}</h3>
                 </div>
                 <div class="w3-third w3-container">
-                    <p>${drink.count}</p>
-                    <p>$${drink.price}</p>
+                <button class="w3-btn w3-red w3-round w3-right">&times;</button>
+                    <p>Amount: ${item.itemCount}</p>
+                    <p>Size: ${item.itemSize}</p>
+                    <p>Price: $ ${item.itemPrice}</p>
                 </div>
-                <span onclick="this.parentElement.style.display='none'" class="w3-button w3-display-right">&times;</span>
             </li>
             `);
 
-            $('#cartList').append(item);
+            totalPrice += item.itemPrice;
+
+            //Note that this is the only button in the item row so it is okay
+            $(itemRow).find('button').on('click', function(e) {
+                $.post('/api/removeFromCart', {
+                    cartItemID: item.id
+                }, (data) => {
+                    reloadCart()
+                });
+            });
+
+            $('#cartList').append(itemRow);
         }
+
+        $('#cart-total-id').text(`Total: $${totalPrice}`);
     }
 
     this.load = () => {

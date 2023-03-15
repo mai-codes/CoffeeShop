@@ -105,6 +105,18 @@ def apiAddToCart():
     result = get_db().apiAddToCart(userID, itemID, size, count)
     return json.jsonify(result)
 
+@app.route('/api/removeFromCart', methods=['POST'])
+def apiRemoveFromCart():
+    userID = -1
+    if(session.get('user').get('userinfo').get('sid') != None):
+        # print(session.get('user').get('sid'))
+        userID = int(session.get('user').get('userinfo').get('sid') != None) #can get from the session variable.
+
+    cartItemID = int(request.form.get('cartItemID', default=-1)) #negative id should not exist
+
+    result = get_db().apiRemoveFromCart(userID, cartItemID)
+    return json.jsonify(result)
+
 @app.route('/api/createOrder', methods=['POST'])
 def apiCreateOrder():
     userID = -1

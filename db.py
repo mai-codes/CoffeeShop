@@ -82,7 +82,7 @@ class Database:
     def apiGetCart(self, userID):
         if(userID != -1):
             #updated to get item size and price based on its size
-            command = "SELECT CartItem.Count, Item.Name, CartItem.Size, IIF(CartItem.Size='Large', Item.LGPrice, IIF(CartItem.Size='Medium', Item.MDPrice, Item.SMPrice) ), Item.Image "\
+            command = "SELECT CartItem.ID, CartItem.Count, Item.Name, CartItem.Size, IIF(CartItem.Size='Large', Item.LGPrice, IIF(CartItem.Size='Medium', Item.MDPrice, Item.SMPrice) ), Item.Image "\
                                 'FROM CartItem '\
                                 'INNER JOIN Item ON Item.ID=CartItem.ItemID '\
                                 'WHERE CartItem.UserID=?'
@@ -90,11 +90,12 @@ class Database:
             data = self.select( command, [userID])
             
             return [{
-                'cartItemCount': d[0],
-                'itemName': d[1],
-                'itemSize': d[2],
-                'itemPrice': d[3],
-                'itemImage': d[4]
+                'id': d[0],
+                'itemCount': d[1],
+                'itemName': d[2],
+                'itemSize': d[3],
+                'itemPrice': d[4],
+                'itemImage': d[5]
             } for d in data]
         else:
             return {
@@ -156,6 +157,21 @@ class Database:
         if(userID != -1):
             # Should check if it already exist. If so, update instead of insert
             data = self.execute('INSERT INTO CartItem (UserID, ItemID, Size, Count) VALUES (?, ?, ?, ?)', [userID, itemID, size, count])
+            
+            #Should check if it actually updated to give valid or useful information
+            return {
+                'Status': 'Successful'
+            }
+        else:
+            return {
+                'Status': 'Failed',
+                'Reason': 'Invalid Permissions'
+            }
+    
+    def apiRemoveFromCart(self, userID, cartItemID):
+        if(userID != -1):
+            # Should check if it already exist. If so, update instead of insert
+            data = self.execute('DELETE FROM CartItem WHERE UserID=? AND ID=?', [userID, cartItemID])
             
             #Should check if it actually updated to give valid or useful information
             return {

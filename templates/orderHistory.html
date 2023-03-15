@@ -1,6 +1,10 @@
 {% extends 'base.html' %}
 {% set active = "orderHistory" %}
 
+{% block header %}
+<script src="/static/js/orderHistoryView.js"></script>
+{% endblock %}
+
 {% block title %}
 orderHistory
 {% endblock %}
@@ -15,17 +19,17 @@ orderHistory
         <a href="/order" class="w3-button w3-light-grey">Return to place an order</a>
         <br>
 
-        <div id="pastOrdersList" class="container">
+        <ul id="pastOrdersList" class="w3-ul">
             <script>
     
                 $(() => {
-                    const orderHistoryView = new OrderHistoryView(10);
-                    orderHistoryView.load();
+                    const orderView = new orderHistoryView();
+                    orderView.load();
                 });
             
             </script>
     
-        </div>
+        </ul>
         <!-- User is logged out  -->
         {% else %}
         <h1>View Order Histroy</h1><br>
