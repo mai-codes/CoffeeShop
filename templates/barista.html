@@ -1,6 +1,10 @@
 {% extends 'base.html' %}
 {% set active = "barista" %}
 
+{% block header %}
+<script src="/static/js/approveOrdersView.js"></script>
+{% endblock %}
+
 {% block title %}
 Barista Settings
 {% endblock %}
@@ -13,11 +17,22 @@ Barista Settings
         <br>
         <!-- Show user's information -->
         {% if session %}
-        <h2><strong>Previously created drinks:</strong></h2>
+        <h2><strong>Pending orders to approve:</strong></h2>
         {% else %}
         <!-- Show link to login button -->
         <h2>To view user information please <a href="/login" >Login</a> . </h2>
         {% endif %}
+
+        <br>
+        
+        <ul id="pendingOrdersList" class="w3-ul">
+            <script>
+                $(() => {
+                    const approveOrderView = new ApproveView();
+                    approveOrderView.load();
+                });
+            
+            </script>
 
     </div>
 </section>

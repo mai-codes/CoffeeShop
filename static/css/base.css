@@ -66,3 +66,7 @@ a:hover{
 .drink-radio-btn input[type="radio"]:checked + label {
     background: lightgray;
 }
+
+.isBarista {
+    display: none;
+}
