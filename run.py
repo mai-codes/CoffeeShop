@@ -232,14 +232,14 @@ def testPage(jwt):
 def manager(jwt):
     if request.method == 'POST':
         name = request.form.get('name')
-        price = request.form.get('price')
+        smprice = int(request.form.get('smallprice', default=0.00))
+        mdprice = int(request.form.get('mediumprice', default=0.00))
+        lgprice = int(request.form.get('largeprice', default=0.00))
         image = request.form.get('image')
         itemType = request.form.get('type')
         description = request.form.get('description')
-        get_db().apiAddItem(itemType= itemType,itemName=name, itemPrice=price,
-                                    itemImage=image, itemDescription=description)
-    return render_template('manager.html', session=session.get('user'), pretty=json.dumps(session.get('user'), indent=4))
-
+        get_db().apiAddItem( itemType, name, smprice, mdprice, lgprice, image, description)
+    return render_template('manager.html', session=session.get('user'), pretty=json.dumps(session.get('user'), indent=4), permission = jwt.get('permissions'))
 
 
 @app.errorhandler(AuthError)
