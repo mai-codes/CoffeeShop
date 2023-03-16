@@ -107,9 +107,7 @@ function DrinkView(numDrinks) {
                     size: sizeName,
                     count: 1
                 }, (data) => {
-                    //probably should do something. Just print the json or something
                     console.log(data);
-                    localStorage.setItem("message","Sucessfully added");
                     updateCart();
                 });
             });
