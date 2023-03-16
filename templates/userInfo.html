@@ -17,6 +17,8 @@ User Information
         <h2><strong>Full Name:</strong> {{ session.userinfo.name }}</h2>
         <br>
         <a href="/logout"class="w3-button w3-light-grey">Logout</a>
+        <a href="/orderHistory" class="w3-button w3-light-grey">View Order History</a>
+        <br>
         {% else %}
         <!-- Show link to login button -->
         <h2>To view user information please <a href="/login" >Login</a> . </h2>

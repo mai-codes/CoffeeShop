@@ -8,8 +8,57 @@ Home
 {% block content %}
 <!-- About Section -->
 <div class="w3-container w3-padding-32 w3-center">  
-  <h3>About dragon drinks</h3><br>
-  <img src="/static/img/latte.jpg" alt="latte" class="w3-image" style="display:block;margin:auto" width="800" height="533">
+  <h2>Welcome to Dragon Drinks!</h2>
+  <h3>This is where all Drexel Dragons come for their daily caffeine boost</h3>
+</div>
+
+<div class="w3-container w3-padding-16 w3-left">  
+  <img style="border: 5px solid rgb(56, 114, 213);"src="/static/img/about4.jpg">
+  <div class = "w3-container w3-right w3-padding-16">
+    <h4>Ready to order? <button class="popup w3-btn w3-round-large w3-sand w3-large" onclick="location.href = '/order';">Place an Order</button>
+    </h4>
+  </div>
+
+</div>
+
+<div class="w3-container w3-padding-16 w3-left">  
+  <img style="border: 5px solid rgb(56, 114, 213); width: 50%;" src="/static/img/about1.jpg">
+  <div class="w3-container w3-padding-16 w3-right">
+    <h4>Hours of Operation</h4>
+    <table class="opening-days">
+      <tbody>
+        <tr>
+          <td class="week-day">Monday</td>
+          <td>9am - 5pm</td>
+        </tr>
+        <tr>
+          <td class="week-day">Tuesday</td>
+          <td>9am - 5pm</td>
+        </tr>
+        <tr>
+          <td class="week-day">Wednesday</td>
+          <td>9am - 5pm</td>
+        </tr>
+        <tr>
+          <td class="week-day">Thursday</td>
+          <td>9am - 5pm</td>
+        </tr>
+        <tr>
+          <td class="week-day">Friday</td>
+          <td>9am - 5pm</td>
+        </tr>
+        <tr>
+          <td class="week-day">Saturday</td>
+          <td>Closed</td>
+        </tr>
+        <tr>
+          <td class="week-day">Sunday</td>
+          <td>Closed</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
 </div>
 
 {% endblock %}
+
