@@ -16,23 +16,7 @@ class Database:
         c = self.conn.cursor()
         c.execute(sql, parameters)
         return c.fetchall()
-
-    def getPermissions(self, accessID):
-        if(accessID >= 0):
-            data = self.select( 'SELECT Type FROM User WHERE ID=?', [accessID])
-            
-            if( len(data) == 0):
-                return -1 #something went wrong
-            
-            if(data[0][0] == 'CUSTOMER'):
-                return 0 #basic level access
-            elif(data[0][0] == 'BARISTA'):
-                return 1 #Access to all orders, adding items, editing items
-            elif(data[0][0] == 'MANAGER'):
-                return 2 #Access to nearly everything. (Fixing and editing orders directly, Changing user type, etc.)
-            
-        return -1 #invalid access level
-        
+    
     
     def apiGetItems(self, n, offset):
         # obtained from the slides.
@@ -53,7 +37,7 @@ class Database:
 
     def apiAddItem(self, itemType, itemName, smallPrice, mediumPrice, largePrice, itemImage, itemDescription):
         try:
-            data = self.execute( 'INSERT INTO ITEM (Type, Name, SMPrice, MDPrice, LGPrice, Image, Description) VALUES (?, ?, ?, ?, ?, ?, ?)', [itemType, itemName, smallPrice, mediumPrice, largePrice, itemImage, itemDescription])
+            self.execute( 'INSERT INTO ITEM (Type, Name, SMPrice, MDPrice, LGPrice, Image, Description) VALUES (?, ?, ?, ?, ?, ?, ?)', [itemType, itemName, smallPrice, mediumPrice, largePrice, itemImage, itemDescription])
             
             #Should check if it actually updated to give valid or useful information
             return {
@@ -67,7 +51,7 @@ class Database:
 
     def apiDeleteItem(self, itemID):
         try:
-            data = self.execute( 'DELETE FROM Item WHERE id=?', [itemID])
+            self.execute( 'DELETE FROM Item WHERE id=?', [itemID])
             #Should check if it actually updated to give valid or useful information
             return {
                 'Status': 'Successful'
@@ -80,7 +64,7 @@ class Database:
     
     #get items in the cart for user
     def apiGetCart(self, userID):
-        if(userID != -1):
+        if(userID != None):
             #updated to get item size and price based on its size
             command = "SELECT CartItem.ID, CartItem.Count, Item.Name, CartItem.Size, IIF(CartItem.Size='Large', Item.LGPrice, IIF(CartItem.Size='Medium', Item.MDPrice, Item.SMPrice) ), Item.Image "\
                                 'FROM CartItem '\
@@ -105,9 +89,9 @@ class Database:
     
     #get all orders from user
     def apiGetOrders(self, userID):
-        if(userID != -1):
+        if(userID != None):
             #Adjusted to get order item price which may not be the same as the current items price and its size.
-            data = self.select('SELECT OrderInfo.ID, OrderInfo.Date, OrderItem.Count, Item.Name, OrderItem.Size, OrderItem.Price, Item.Image, OrderInfo.Status '\
+            data = self.select('SELECT OrderInfo.ID, OrderInfo.Date, OrderItem.Count, Item.Name, OrderItem.Size, OrderItem.Price, Item.Image, OrderInfo.Status, OrderInfo.StatusMessage '\
                                 'FROM OrderInfo '\
                                 'INNER JOIN OrderItem ON OrderInfo.ID=OrderItem.OrderID '\
                                 'INNER JOIN Item ON Item.ID=OrderItem.ItemID '\
@@ -122,7 +106,8 @@ class Database:
                 'itemSize': d[4],
                 'itemPrice': d[5],
                 'itemImage': d[6],
-                'orderStatus': d[7]
+                'orderStatus': d[7],
+                'statusMessage': d[8]
             } for d in data]
         else:
             return {
@@ -131,7 +116,7 @@ class Database:
             }
     
     def apiGetAllOrders(self):
-        data = self.select('SELECT OrderInfo.ID, OrderInfo.Date, OrderItem.Count, Item.Name, OrderItem.Size, OrderItem.Price, Item.Image, OrderInfo.Status'\
+        data = self.select('SELECT OrderInfo.ID, OrderInfo.Date, OrderItem.Count, Item.Name, OrderItem.Size, OrderItem.Price, Item.Image, OrderInfo.Status, OrderInfo.StatusMessage '\
                             'FROM OrderInfo '\
                             'INNER JOIN OrderItem ON OrderInfo.ID=OrderItem.OrderID '\
                             'INNER JOIN Item ON Item.ID=OrderItem.ItemID ORDER BY OrderInfo.Date DESC')
@@ -144,13 +129,14 @@ class Database:
             'itemSize': d[4],
             'itemPrice': d[5],
             'itemImage': d[6],
-            'orderStatus': d[7]
+            'orderStatus': d[7],
+            'statusMessage': d[8]
         } for d in data]
     
     def apiAddToCart(self, userID, itemID, size, count):
-        if(userID != -1):
+        if(userID != None):
             # Should check if it already exist. If so, update instead of insert
-            data = self.execute('INSERT INTO CartItem (UserID, ItemID, Size, Count) VALUES (?, ?, ?, ?)', [userID, itemID, size, count])
+            self.execute('INSERT INTO CartItem (UserID, ItemID, Size, Count) VALUES (?, ?, ?, ?)', [userID, itemID, size, count])
             
             #Should check if it actually updated to give valid or useful information
             return {
@@ -163,9 +149,9 @@ class Database:
             }
     
     def apiRemoveFromCart(self, userID, cartItemID):
-        if(userID != -1):
+        if(userID != None):
             # Should check if it already exist. If so, update instead of insert
-            data = self.execute('DELETE FROM CartItem WHERE UserID=? AND ID=?', [userID, cartItemID])
+            self.execute('DELETE FROM CartItem WHERE UserID=? AND ID=?', [userID, cartItemID])
             
             #Should check if it actually updated to give valid or useful information
             return {
@@ -178,7 +164,7 @@ class Database:
             }
     
     def apiCreateOrder(self, userID):
-        if(userID != -1):
+        if(userID != None):
 
             # Only add if there are items in the cart
             data = self.select('SELECT * FROM CartItem Where CartItem.UserID=?', [userID])
@@ -218,101 +204,55 @@ class Database:
                 'Reason': 'Invalid Permissions'
             }
     
-    def apiGetPendingOrders(self, accessID):
-        if(self.getPermissions(accessID) >= 1):
-            data = self.select('SELECT OrderInfo.ID, OrderInfo.Date, OrderItem.Count, Item.Name, OrderItem.Size, OrderItem.Price, Item.Image, OrderInfo.Status'\
-                                'FROM OrderInfo '\
-                                'INNER JOIN OrderItem ON OrderInfo.ID=OrderItem.OrderID '\
-                                'INNER JOIN Item ON Item.ID=OrderItem.ItemID '\
-                                "WHERE Status='Pending' "\
-                                'ORDER BY OrderInfo.Date ASC')
+    def apiGetPendingOrders(self):
+        data = self.select('SELECT OrderInfo.ID, OrderInfo.Date, OrderItem.Count, Item.Name, OrderItem.Size, OrderItem.Price, Item.Image, OrderInfo.Status'\
+                            'FROM OrderInfo '\
+                            'INNER JOIN OrderItem ON OrderInfo.ID=OrderItem.OrderID '\
+                            'INNER JOIN Item ON Item.ID=OrderItem.ItemID '\
+                            "WHERE Status='Pending' "\
+                            'ORDER BY OrderInfo.Date ASC')
 
-            #Not including status message since that is mostly for the customer so they know why their order was canceled.
-            return [{
-                'orderID': d[0],
-                'orderDate': d[1],
-                'itemCount': d[2],
-                'itemName': d[3],
-                'itemSize': d[4],
-                'itemPrice': d[5],
-                'itemImage': d[6],
-                'orderStatus': d[7]
-            } for d in data]
-        else:
-            return {
-                'Status': 'Failed',
-                'Reason': 'Invalid Permissions'
-            }
+        #Not including status message since that is mostly for the customer so they know why their order was canceled.
+        return [{
+            'orderID': d[0],
+            'orderDate': d[1],
+            'itemCount': d[2],
+            'itemName': d[3],
+            'itemSize': d[4],
+            'itemPrice': d[5],
+            'itemImage': d[6],
+            'orderStatus': d[7]
+        } for d in data]
 
-    def apiApproveOrder(self, accessID, orderID):
-        if(self.getPermissions(accessID) >= 1 and orderID != -1):
-            self.execute("UPDATE OrderInfo SET Status='Approved' WHERE ID=?", [orderID])
+    def apiApproveOrder(self, orderID):
+        self.execute("UPDATE OrderInfo SET Status='Approved' WHERE ID=?", [orderID])
 
-            #!Should send email confirmation here if we have time.
+        #!Should send email confirmation here if we have time.
 
-            #Should check if it actually updated to give valid or useful information
-            return {
-                'Status': 'Successful'
-            }
-        else:
-            return {
-                'Status': 'Failed',
-                'Reason': 'Invalid Permissions or Order ID'
-            }
+        #Should check if it actually updated to give valid or useful information
+        return {
+            'Status': 'Successful'
+        }
     
-    def apiCancelOrder(self, accessID, userID, orderID, message):
-        if((self.getPermissions(accessID) >= 1 or accessID==userID) and orderID != -1 and accessID != -1):
-
-            #Message provided by barista/manager or if user, then the message 'User Submitted' or something
-            #May be better to just delete the order entirely. It does not hurt to keep it along with the reason though so the default will be to keep them.
-            
-            if(self.getPermissions(accessID) >= 1):
-                #can update any order
-                self.execute("UPDATE OrderInfo SET Status='Canceled', StatusMessage=? WHERE ID=?", [message, orderID])
-            else:
-                #Can only update orders that belong to the user.
-                self.execute("UPDATE OrderInfo SET Status='Canceled', StatusMessage=? WHERE ID=? AND UserID=?", [message, orderID, userID])
-
-            #!Should send email confirmation here if we have time.
-
-            #Should check if it actually updated to give valid or useful information
-            return {
-                'Status': 'Successful'
-            }
-        else:
-            return {
-                'Status': 'Failed',
-                'Reason': 'Invalid Permissions or Order ID'
-            }
-
-    def apiSetUserToEmployee(self, accessID, userID):
-        if(self.getPermissions(accessID) >= 2):
-            self.execute("UPDATE User SET Type=? WHERE ID=?", ['BARISTA', userID])
-            #Should check if it actually updated to give valid or useful information
-            return {
-                'Status': 'Successful'
-            }
-        else:
-            return {
-                'Status': 'Failed',
-                'Reason': 'Invalid Permissions'
-            }
+    def apiCancelOrderEmployee(self, orderID, message):
+        #can update any order
+        self.execute("UPDATE OrderInfo SET Status='Canceled', StatusMessage=? WHERE ID=?", [message, orderID])
         
-    def get_user(self, username):
-        data = self.select(
-            'SELECT * FROM user WHERE username=?', [username])
-        if data:
-            d = data[0]
-            return {
-                'id': d[0],
-                'userType': d[1],
-                'email': d[2],
-                'username': d[3],
-                'EncryptPass': d[4]
-            }
-        else:
-            return None
+        #!Should send email confirmation here if we have time.
 
+        return {
+            'Status': 'Successful'
+        }
+    
+    def apiCancelOrder(self, userID, orderID, message):
+        self.execute("UPDATE OrderInfo SET Status='Canceled', StatusMessage=? WHERE ID=? AND UserID=?", [message, orderID, userID])
+
+        #!Should send email confirmation here if we have time.
+
+        #Should check if it actually updated to give valid or useful information
+        return {
+            'Status': 'Successful'
+        }
     
     def close(self):
         self.conn.close()

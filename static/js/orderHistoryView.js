@@ -3,6 +3,11 @@ document.onload = function() {
     orderLoader.load();
 };
 
+function reloadHistory() {
+    orderLoader = new orderHistoryView();
+    orderLoader.load();
+}
+
 function orderHistoryView() {
     this.update = (data) => {
         if (!Array.isArray(data)) {
@@ -35,6 +40,22 @@ function orderHistoryView() {
                 orderDiv.append( $(`<h3>Date: ${item.orderDate}</h3>`) );
                 orderDiv.append( $(`<h3>OrderStatus: ${item.orderStatus}</h3>`) );
                 orderDiv.append( $(`<h3 id='price_${item.orderID}'>Total: </h3>`));
+                if(item.orderStatus == 'Pending')
+                {
+                    orderDiv.append( $(`<button class='w3-btn w3-yellow w3-round'>Cancel</button>`));
+                    $(orderDiv).find(`button`).on('click', function(e) {
+                        $.post('/api/cancelOrder', {
+                            orderID: item.orderID
+                        }, (data) => {
+                            console.log(data);
+                            reloadHistory();
+                        });
+                    });
+                }
+                else if(item.orderStatus == 'Canceled')
+                {
+                    orderDiv.append( $(`<h4>Reason: ${item.statusMessage}</h4>`))
+                }
             }
             else if(item.orderID != knownOrderID)
             {
@@ -48,6 +69,22 @@ function orderHistoryView() {
                 orderDiv.append( $(`<h3>Date: ${item.orderDate}</h3>`) );
                 orderDiv.append( $(`<h3>OrderStatus: ${item.orderStatus}</h3>`) );
                 orderDiv.append( $(`<h3 id='price_${item.orderID}'>Total: </h3>`));
+                if(item.orderStatus == 'Pending')
+                {
+                    orderDiv.append( $(`<button class='w3-btn w3-yellow w3-round'>Cancel</button>`));
+                    $(orderDiv).find(`button`).on('click', function(e) {
+                        $.post('/api/cancelOrder', {
+                            orderID: item.orderID
+                        }, (data) => {
+                            console.log(data);
+                            reloadHistory();
+                        });
+                    });
+                }
+                else if(item.orderStatus == 'Canceled')
+                {
+                    orderDiv.append( $(`<h4>Reason: ${item.statusMessage}</h4>`))
+                }
             }
 
             knownOrderID = item.orderID;

@@ -53,37 +53,33 @@ def apiGetItems():
 
 @app.route('/api/getCart', methods=['GET'])
 def apiGetCart():
-    userID = -1
+    userID = None
+    if(session.get('user').get('userinfo').get('sub') != None):
+        userID = session.get('user').get('userinfo').get('sub') #can get from the session variable.
 
-    if(session.get('user').get('userinfo').get('sid') != None):
-        userID = session.get('user').get('userinfo').get('sid') #can get from the session variable.
     cartItems = get_db().apiGetCart(userID)
     return json.jsonify(cartItems)
 
 @app.route('/api/getOrders', methods=['GET'])
 def apiGetOrders():
-    userID = -1
-    if(session.get('user').get('userinfo').get('sid') != None):
-        userID = session.get('user').get('userinfo').get('sid')
+    userID = None
+    if(session.get('user').get('userinfo').get('sub') != None):
+        userID = session.get('user').get('userinfo').get('sub') #can get from the session variable.
+
     ordersInfo = get_db().apiGetOrders(userID)
     return json.jsonify(ordersInfo)
 
-# User ID no longer needed here other than to check for permissions.
+# User ID no longer needed here other than to check for permissions which can be done differently.
 @app.route('/api/getAllOrders', methods=['GET'])
 def apiGetAllOrders():
-    userID = -1
-    if(session.get('user').get('userinfo').get('sid') != None):
-        userID = session.get('user').get('userinfo').get('sid')
-    
     ordersInfo = get_db().apiGetAllOrders()
     return json.jsonify(ordersInfo)
 
+# User ID no longer needed here other than to check for permissions which can be done differently.
 @app.route('/api/getPendingOrders', methods=['GET'])
 def apiGetPendingOrders():
-    userID = -1
-    if(session.get('user').get('userinfo').get('sid') != None):
-        userID = session.get('user').get('userinfo').get('sid')
-    ordersInfo = get_db().apiGetPendingOrders(userID)
+
+    ordersInfo = get_db().apiGetPendingOrders()
     return json.jsonify(ordersInfo)
 
 
@@ -92,10 +88,9 @@ def apiGetPendingOrders():
 
 @app.route('/api/addToCart', methods=['POST'])
 def apiAddToCart():
-    userID = -1
-    if(session.get('user').get('userinfo').get('sid') != None):
-        # print(session.get('user').get('sid'))
-        userID = session.get('user').get('userinfo').get('sid') #can get from the session variable.
+    userID = None
+    if(session.get('user').get('userinfo').get('sub') != None):
+        userID = session.get('user').get('userinfo').get('sub') #can get from the session variable.
 
     itemID = int(request.form.get('itemID', default=-1)) #negative id should not exist
     size = request.form.get('size', default="Small")
@@ -106,9 +101,9 @@ def apiAddToCart():
 
 @app.route('/api/removeFromCart', methods=['POST'])
 def apiRemoveFromCart():
-    userID = -1
-    if(session.get('user').get('userinfo').get('sid') != None):
-        userID = session.get('user').get('userinfo').get('sid') #can get from the session variable.
+    userID = None
+    if(session.get('user').get('userinfo').get('sub') != None):
+        userID = session.get('user').get('userinfo').get('sub') #can get from the session variable.
 
     cartItemID = int(request.form.get('cartItemID', default=-1)) #negative id should not exist
 
@@ -117,19 +112,17 @@ def apiRemoveFromCart():
 
 @app.route('/api/createOrder', methods=['POST'])
 def apiCreateOrder():
-    userID = -1
-    if(session.get('user').get('userinfo').get('sid') != None):
-        userID = session.get('user').get('userinfo').get('sid') #can get from the session variable.
-        
+    userID = None
+    if(session.get('user').get('userinfo').get('sub') != None):
+        userID = session.get('user').get('userinfo').get('sub') #can get from the session variable.
+
     result = get_db().apiCreateOrder(userID)
     return json.jsonify(result)
 
+# Access ID no longer needed other than to check for permissions which can be done differently.
 @app.route('/api/addItem', methods=['POST'])
 def apiAddItem():
-    accessID = -1
-    if(session.get('user').get('userinfo').get('sid') != None):
-        accessID = session.get('user').get('userinfo').get('sid') #can get from the session variable.
-
+    
     itemType = int(request.form.get('itemType', default=0)) #0 == coffee, 1 == tea. Just for sorting purposes
     name = int(request.form.get('name', default='N/A'))
     smprice = int(request.form.get('smallprice', default=0.00))
@@ -138,33 +131,42 @@ def apiAddItem():
     image = int(request.form.get('image', default=''))
     desc = int(request.form.get('description', default=''))
     
-    result = get_db().apiAddItem(accessID, itemType, name, smprice, mdprice, lgprice, image, desc)
+    result = get_db().apiAddItem( itemType, name, smprice, mdprice, lgprice, image, desc)
     return json.jsonify(result)
 
+# Access ID no longer needed other than to check for permissions which can be done differently.
 @app.route('/api/deleteItem', methods=['POST']) #changed to post since delete is not suppose to have a body and jquery does not have $.delete()
 def apiDeleteItem():
     id = int(request.form.get('id', default=-1)) #negative id should not exist
     result = get_db().apiDeleteItem(id)
     return json.jsonify(result)
 
+# Access ID no longer needed other than to check for permissions which can be done differently.
 @app.route('/api/approveOrder', methods=['POST'])
 def apiApproveOrder():
-    accessID = -1
-    if(session['user'] != None):
-        accessID = int(session['user']['id']) #can get from the session variable.
     orderID = int(request.form.get('orderID', default=-1)) #negative id should not exist
-    result = get_db().apiApproveOrder(accessID, orderID)
+    result = get_db().apiApproveOrder(orderID)
     return json.jsonify(result)
 
+# Access ID no longer needed other than to check for permissions which can be done differently.
 @app.route('/api/cancelOrder', methods=['POST'])
 def apiCancelOrder():
-    accessID = -1
-    if(session['user'] != None):
-        accessID = int(session['user']['id']) #can get from the session variable.
-    userID = int(request.form.get('userID', default=-1))
+    userID = None
+    if(session.get('user').get('userinfo').get('sub') != None):
+        userID = session.get('user').get('userinfo').get('sub') #can get from the session variable.
+
     orderID = int(request.form.get('orderID', default=-1)) #negative id should not exist
-    message = int(request.form.get('message', default='User Requested'))
-    result = get_db().apiCancelOrder(accessID, userID, orderID, message)
+    message = request.form.get('message', default='User Requested')
+    result = get_db().apiCancelOrder(userID, orderID, message)
+    # print(result)
+    return json.jsonify(result)
+
+# Access ID no longer needed other than to check for permissions which can be done differently.
+@app.route('/api/cancelOrderAdmin', methods=['POST'])
+def apiCancelOrderAdmin():
+    orderID = int(request.form.get('orderID', default=-1)) #negative id should not exist
+    message = request.form.get('message', default='No Reason Given')
+    result = get_db().apiCancelOrder(orderID, message)
     return json.jsonify(result)
 
 @app.route("/login")

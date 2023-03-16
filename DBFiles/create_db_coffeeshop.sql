@@ -1,18 +1,9 @@
 
--- This is assuming that we store the password and username here. We require the Email though for order confirmation.
-CREATE TABLE IF NOT EXISTS User  (
-	ID INTEGER PRIMARY KEY,
-	Type TEXT NOT NULL, -- Should be Customer, Barista, Manager, etc.
-	Email TEXT NOT NULL, -- Can be used for resetting password and sending order confirmations
-	Username TEXT NOT NULL,
-	EncryptPass TEXT NOT NULL
-);
-
 -- All orders should be visible by an admin of some sorts.
 -- Use Transactions (sql thing) to allow pending orders.
 CREATE TABLE IF NOT EXISTS OrderInfo (
 	ID INTEGER PRIMARY KEY,
-	UserID INTEGER NOT NULL,
+	UserID TEXT NOT NULL,
 	Status TEXT NOT NULL,		--Status (Accepted, Processing, Canceled, etc.)
 	Date DATETIME,
 	StatusMessage Text		--Status Message Reason for failure
@@ -48,7 +39,7 @@ CREATE TABLE IF NOT EXISTS OrderItem (
 -- Note that the price of an item can change based on size and date. (Price in order history should be what you paid and not the current price)
 CREATE TABLE IF NOT EXISTS CartItem (
 	ID INTEGER PRIMARY KEY,
-	UserID INTEGER NOT NULL,
+	UserID TEXT NOT NULL,
 	ItemID INTEGER NOT NULL,
 	Size TEXT NOT NULL,
 	Count INTEGER
