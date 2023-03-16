@@ -9,10 +9,9 @@ ENV_FILE = find_dotenv()
 if ENV_FILE:
     load_dotenv(ENV_FILE)
     
-## AuthError Exception
 '''
-AuthError Exception
-A standardized way to communicate auth failure modes
+Code adapted from Auth0 documentation/github repo:
+https://github.com/auth0-samples/auth0-python-api-samples/blob/master/00-Starter-Seed/server.py
 '''
 class AuthError(Exception):
     def __init__(self, error, status_code):
@@ -23,17 +22,12 @@ class AuthError(Exception):
 ## Auth Header
 
 def get_token_auth_header():
-    # obtain token from authorization header
-    # auth = request.headers.get('Authorization', None)
-    # print("REQUEST HEADERS: \n", request.headers)
-    # print(auth)
-
     tokenData = open('token.txt', 'r')
     tokenLine = tokenData.readlines()
 
     token = tokenLine
     auth = ''.join(token)
-    # print(auth)
+
     # check if authorization header included
     if not auth:
         raise AuthError({
