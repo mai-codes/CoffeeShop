@@ -228,7 +228,7 @@ def testPage(jwt):
     return render_template('barista.html', session=session.get('user'), pretty=json.dumps(session.get('user'), indent=4), permission = jwt.get('permissions'))
 
 @app.route('/manager', methods=['GET', 'POST'])
-@requires_auth('post:deletedrinks')
+@requires_auth('post:drinks')
 def manager(jwt):
     if request.method == 'POST':
         name = request.form.get('name')
