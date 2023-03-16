@@ -1,6 +1,15 @@
-function refreshPage(){
-    window.location.reload();
-} 
+function updateCart(){
+    $.get('/api/getCart', {
+    }, (data) => {
+        let totalCount = 0;
+        for (let itemCount in data){
+            totalCount = totalCount + 1;
+        }
+        console.log(totalCount);
+        $('#cart').text(`View Cart (${totalCount})`);
+    });
+
+}
 
 function DrinkView(numDrinks) {
     this.update = (data) => {
@@ -12,7 +21,7 @@ function DrinkView(numDrinks) {
         this.updateDrinks(data);
     }
 
-    this.updateCart = (data) => {
+    this.loadCart = (data) => {
         let totalCount = 0;
         for (let itemCount in data){
             totalCount = totalCount + 1;
@@ -81,14 +90,10 @@ function DrinkView(numDrinks) {
                 }, (data) => {
                     //probably should do something. Just print the json or something
                     console.log(data);
-                    refreshPage()
+                    updateCart();
                 });
             });
 
-
-            $(drinkRow).find('.dec-button').on('click', _ => {
-                this.decrement(drink);
-            });
 
             $(drinkRow).find('.dec-button').on('click', _ => {
                 this.decrement(drink);
@@ -111,12 +116,7 @@ function DrinkView(numDrinks) {
         });
         $.get('/api/getCart', {
         }, (data) => {
-            // let totalCount = 0;
-            // for (let itemCount in data){
-            //     totalCount = totalCount + 1;
-            // }
-            // console.log(totalCount);
-            this.updateCart(data);
+            this.loadCart(data);
         });
     };
 }
