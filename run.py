@@ -124,12 +124,12 @@ def apiCreateOrder():
 def apiAddItem():
     
     itemType = int(request.form.get('itemType', default=0)) #0 == coffee, 1 == tea. Just for sorting purposes
-    name = int(request.form.get('name', default='N/A'))
+    name = str(request.form.get('name', default='N/A'))
     smprice = int(request.form.get('smallprice', default=0.00))
     mdprice = int(request.form.get('mediumprice', default=0.00))
     lgprice = int(request.form.get('largeprice', default=0.00))
-    image = int(request.form.get('image', default=''))
-    desc = int(request.form.get('description', default=''))
+    image = str(request.form.get('image', default=''))
+    desc = str(request.form.get('description', default=''))
     
     result = get_db().apiAddItem( itemType, name, smprice, mdprice, lgprice, image, desc)
     return json.jsonify(result)
@@ -231,14 +231,7 @@ def testPage(jwt):
 @requires_auth('post:drinks')
 def manager(jwt):
     if request.method == 'POST':
-        name = request.form.get('name')
-        smprice = int(request.form.get('smallprice', default=0.00))
-        mdprice = int(request.form.get('mediumprice', default=0.00))
-        lgprice = int(request.form.get('largeprice', default=0.00))
-        image = request.form.get('image')
-        itemType = request.form.get('type')
-        description = request.form.get('description')
-        get_db().apiAddItem( itemType, name, smprice, mdprice, lgprice, image, description)
+        apiAddItem()
     return render_template('manager.html', session=session.get('user'), pretty=json.dumps(session.get('user'), indent=4), permission = jwt.get('permissions'))
 
 
