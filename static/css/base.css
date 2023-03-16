@@ -43,6 +43,16 @@ body,h1,h2,h3,h4,h5,h6 {
     font-family: "Karma", sans-serif;
 }
 
+.home-pg {
+    text-align: center;
+    display:flex;
+    float:right;
+}
+
+.home-pg-desc {
+    text-align: justify;
+}
+
 .drinkCards {
     margin: 0, auto;
     max-width: 1000px;
@@ -93,6 +103,8 @@ a:hover{
     color: black;
     text-align: center;
 }
+
+.clear { clear: both; height: 60px; }
 
 /* Popup container */
 .popup {
