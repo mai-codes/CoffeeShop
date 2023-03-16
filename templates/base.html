@@ -27,10 +27,14 @@
             <a href="/" onclick="w3_close()" class="w3-bar-item w3-button">Home</a>
             <a href="/order" onclick="w3_close()" class="w3-bar-item w3-button">Place An Order</a>
             <a href="/cart" onclick="w3_close()" class="w3-bar-item w3-button">View Cart</a>
-            <a href="/orderHistory" onclick="w3_close()" class="w3-bar-item w3-button">View Order History</a>
+            <a href="/orderHistory" onclick="w3_close()" class="w3-bar-item w3-button">View My Order History</a>
             <a href="/userInfo" onclick="w3_close()" class="w3-bar-item w3-button">User Information</a>
-            <a href="/barista" onclick="w3_close()" class="w3-bar-item w3-button">Pending Orders</a>
+            {% if 'post:drinks' in permission %}
             <a href="/manager" onclick="w3_close()" class="w3-bar-item w3-button">Manage Menu</a>
+            {% endif %}
+            {% if 'post:deletedrinks' in permission %}
+            <a href="/barista" onclick="w3_close()" class="w3-bar-item w3-button">Dragon Drinks Settings</a>
+            {% endif %}
             {% if session %}
             <!-- show logout button -->
             <a href="/logout" onclick="w3_close()" class="w3-bar-item w3-button">Logout</a>
@@ -68,6 +72,8 @@
             {% block content %}{% endblock %}
         </div>
     </main>
+
+    <div class="clear"></div>
 
     <div class="footer">
         <p>Dragon Drinks <i class="fa fa-copyright"></i></p>

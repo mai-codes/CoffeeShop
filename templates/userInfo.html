@@ -18,6 +18,9 @@ User Information
         <br>
         <a href="/logout"class="w3-button w3-light-grey">Logout</a>
         <a href="/orderHistory" class="w3-button w3-light-grey">View Order History</a>
+        {% if 'post:drinks' in permission %}
+        <a href="/manager" class="w3-button w3-light-grey">Manage Menu</a>
+        {% endif %}
         <br>
         {% else %}
         <!-- Show link to login button -->

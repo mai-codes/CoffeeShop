@@ -215,8 +215,9 @@ def orderHistory():
     return render_template('orderHistory.html', session=session.get('user'), pretty=json.dumps(session.get('user'), indent=4))
 
 @app.route('/userInfo')
-def userInfo():
-    return render_template('userInfo.html', session=session.get('user'), pretty=json.dumps(session.get('user'), indent=4))
+@requires_auth('get:drinks')
+def userInfo(jwt):
+    return render_template('userInfo.html', session=session.get('user'), pretty=json.dumps(session.get('user'), indent=4), permission = jwt.get('permissions'))
 
 @app.route('/cart')
 def cart():
@@ -228,7 +229,7 @@ def testPage(jwt):
     return render_template('barista.html', session=session.get('user'), pretty=json.dumps(session.get('user'), indent=4), permission = jwt.get('permissions'))
 
 @app.route('/manager', methods=['GET', 'POST'])
-@requires_auth('post:deletedrinks')
+@requires_auth('post:drinks')
 def manager(jwt):
     if request.method == 'POST':
         apiAddItem()

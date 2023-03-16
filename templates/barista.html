@@ -6,18 +6,18 @@
 {% endblock %}
 
 {% block title %}
-Barista Settings
+History Archive
 {% endblock %}
 
 {% block content %}
 
 <section>
     <div class="w3-main w3-content w3-padding">
-        <h1>Barista Settings</h1>
+        <h1>History Archive</h1>
         <br>
         <!-- Show user's information -->
         {% if session %}
-        <h2><strong>Pending orders to approve:</strong></h2>
+        <h2><strong>View all order history here:</strong></h2>
         {% else %}
         <!-- Show link to login button -->
         <h2>To view user information please <a href="/login" >Login</a> . </h2>

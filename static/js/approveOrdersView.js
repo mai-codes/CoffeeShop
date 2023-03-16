@@ -8,10 +8,6 @@ function reloadHistory() {
     orderLoader.load();
 }
 
-// if (document.getElementById("role") == "Customer"){
-//     $("isBarista").show();
-//     console.log("not");
-// }
 
 function ApproveView() {
     this.update = (data) => {
@@ -76,9 +72,9 @@ function ApproveView() {
                 orderDiv.append( $(`<h3 id='price_${item.orderID}'>Total: </h3>`));
                 if(item.orderStatus == 'Pending')
                 {
-                    orderDiv.append( $(`<button class='w3-btn w3-yellow w3-round'>Cancel</button>`));
+                    orderDiv.append( $(`<button class='w3-btn w3-green w3-round'>Approve</button>`));
                     $(orderDiv).find(`button`).on('click', function(e) {
-                        $.post('/api/cancelOrder', {
+                        $.post('/api/approveOrder', {
                             orderID: item.orderID
                         }, (data) => {
                             console.log(data);
@@ -123,7 +119,7 @@ function ApproveView() {
     }
 
     this.load = () => {
-        $.get('/api/getOrders', {}, (data) => {
+        $.get('/api/getAllOrders', {}, (data) => {
             this.update(data);
         });
     };
