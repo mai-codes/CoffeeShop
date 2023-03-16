@@ -97,7 +97,7 @@ a:hover{
     left: 50%;
   }
   
-  /* Toggle this class - hide and show the popup */
+  /* Hide and show the popup */
   .popup .show {
     visibility: visible;
     -webkit-animation: fadeIn 1s;
@@ -109,8 +109,12 @@ a:hover{
     from {opacity: 0;} 
     to {opacity: 1;}
   }
-  
   @keyframes fadeIn {
     from {opacity: 0;}
     to {opacity:1 ;}
+  }
+
+  #cartButton {
+    position: absolute;
+    text-align: left;
   }

@@ -80,7 +80,7 @@ function DrinkView(numDrinks) {
                 
                     <footer class="w3-container w3-sand">
                         <h5>$ ${drink.smallprice}</h5>
-                        <button class="popup w3-button" id="addToCart" onclick="myFunction()">Add to Cart
+                        <button class="popup w3-button" onclick="myFunction()">Add to Cart
                         </button>
                     </footer>
 

@@ -11,13 +11,25 @@ Cart
 
 {% block content %}
 
+<script>
+        // When the user clicks on div, open the popup
+        function myFunction() {
+          var popup = document.getElementById("myPopup");
+          popup.classList.toggle("show");
+          setTimeout(function(){
+            popup.classList.toggle("show");
+            }, 3000);
+         }
+</script>
+
 <section class="jumbotron">
     <div class="text-center">
 		<div class="w3-container">
+			<button class="popup w3-btn w3-round-large w3-khaki w3-xlarge" onclick="checkout();myFunction()">Checkout</button>
 			<h1 class="w3-threequarter jumbotron-heading">View Cart Items</h1>
 			<div class="w3-container w3-quarter">
 				<h3 id="cart-total-id">Total: $0.00</h3>
-				<button class="w3-btn w3-round-large w3-khaki w3-xlarge" onclick="checkout()">Checkout</button>
+				<div class="popup" id="cartButton"><span class="popuptext" id="myPopup">Successful Checkout</span></div>
 			</div>
 		</div>
 		<ul id="cartList" class="w3-ul w3-card">
