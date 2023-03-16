@@ -34,6 +34,23 @@ function DrinkView(numDrinks) {
         $('#drinktable').empty();
         const table = $('<div class="w3-container drinkCards"></div>');
 
+        const popUp = $(`<script>
+        // When the user clicks on div, open the popup
+        function myFunction() {
+          var popup = document.getElementById("myPopup");
+          popup.classList.toggle("show");
+          setTimeout(function(){
+            popup.classList.toggle("show");
+            }, 2000);
+            }
+        </script>`)
+
+        $('#drinktable').append(popUp);
+
+        const itemAddedMessage = $(`<div class="popup"><span class="popuptext" id="myPopup">Item Added</span></div>`)
+
+        $('#drinktable').append(itemAddedMessage);
+
         for (let i = 0; i < numDrinks && i < drinks.length; i++) {
             const drink = drinks[i];
 
@@ -63,8 +80,10 @@ function DrinkView(numDrinks) {
                 
                     <footer class="w3-container w3-sand">
                         <h5>$ ${drink.smallprice}</h5>
-                        <button class="w3-button">Add to Cart</button>
+                        <button class="popup w3-button" id="addToCart" onclick="myFunction()">Add to Cart
+                        </button>
                     </footer>
+
                 </div>
             </div>
             `);
@@ -90,16 +109,9 @@ function DrinkView(numDrinks) {
                 }, (data) => {
                     //probably should do something. Just print the json or something
                     console.log(data);
+                    localStorage.setItem("message","Sucessfully added");
                     updateCart();
                 });
-            });
-
-
-            $(drinkRow).find('.dec-button').on('click', _ => {
-                this.decrement(drink);
-            });
-            $(drinkRow).find('.inc-button').on('click', _ => {
-                this.increment(drink);
             });
 
             $(table).append(drinkRow);
